@@ -1,0 +1,181 @@
+.cs-bg-blue{
+    background-color: #0c70a4 !important;
+}
+.navbar-top-links li {
+    display: inline-block;
+}
+.navbar-top-links li a:hover, .navbar-top-links .open > a  {
+    background-color: rgba(255, 255, 255, .0) !important;
+}
+.navbar-top-links ul .panel{
+    width: 250px;
+    margin-bottom: 0px;
+}
+.navbar-top-links .dropdown-menu{
+    padding: 0 0;   
+}
+#cs-loading i{
+    top: 35%;
+    position: relative;
+}
+.table-hover .cs-with-modal tr td{
+    cursor: pointer;
+}
+.cs-top-logo{
+    width: 220px;
+    margin-top: 45px;
+}
+div.cs-top{
+    height: 130px;
+}
+div.cs-navbar{
+    background-image: -webkit-linear-gradient(top, #fff 0%, #f8f8f8 100%);
+    background-image:         linear-gradient(to bottom, #fff 0%, #f8f8f8 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff8f8f8', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    background-repeat: repeat-x;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+}
+div.cs-navbar .active{
+    background-color: #eee;
+}
+.cs-qtd-num{
+    font-size: 65px;
+}
+.cs-qtd-title{
+    font-size: 20px;
+}
+.cs-qtd-box .cs-qtd-icon{
+    position: absolute;
+    top: auto;
+    bottom: 15px;
+    right: 30px;
+    z-index: 0;
+    font-size: 115px;
+    color: #444444;
+}
+.cs-qtd-box{
+    background-color: #d3d3d3;
+    color: #444444;
+    height: 200px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    //border: 3px solid #444444;
+}
+.cs-qtd-box:hover > .cs-qtd-icon {
+    animation-name: animation-ico-qtd;
+    animation-duration: .5s;
+    animation-iteration-count: 1;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    -webkit-animation-name: animation-ico-qtd;
+    -webkit-animation-duration: .5s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-name: animation-ico-qtd;
+    -moz-animation-duration: .5s;
+    -moz-animation-iteration-count: 1;
+    -moz-animation-timing-function: ease;
+    -moz-animation-fill-mode: forwards;
+}
+@keyframes animation-ico-qtd {
+    from {
+        font-size: 115px;
+    }
+    to {
+        font-size: 125px;
+    }
+}
+@-webkit-keyframes animation-ico-qtd {
+    from {
+        font-size: 115px;
+    }
+    to {
+        font-size: 125px;
+    }
+}
+.cs-qtd-inner{
+    padding: 15px 15px 0px 15px;
+}
+.cs-mt45{
+    margin-top: 40px;
+}
+#cs-dataGrid .dropdown-menu{
+    left:20px;
+    top:10px;
+}
+#cs-dataGrid .ion{
+    color: #327932;
+}
+.pagination .active a{
+    background-color: #0c70a4 !important;
+    border-color: #0c70a4 !important;
+}
+.pagination li a, .pagination li a:hover, .pagination li a:focus{
+    color: #000000;
+}
+.panel-heading{
+    font-size: 20px;
+    color: #525252;
+}
+.cs-p-botton25{
+    padding-bottom: 25px;
+}
+.cs-erro-num{
+    color: #0c70a4;
+    font-size: 120px;
+}
+.cs-erro-container{
+    margin-top: 5%;
+}
+.cs-alert{
+    width: 300px;
+    bottom: 30px;
+    right: 50px;
+    position: fixed;
+    z-index: 99999;
+}
+#cs-list-modal li{
+    padding-top: 6px;
+}
+#cs-list-modal strong{
+    padding-right: 6px;
+    padding-left: 6px;
+}
+.cs-color-white{
+    color: #ffffff;
+}
+div#cs-loading{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.84);
+    z-index: 100;
+    text-align: center;
+}
+.cs-form button .cs-editar{
+    display: none;
+}
+.cs-form button .cs-cancelar{
+    display: none;
+}
+input.cs-id-form, .cs-outro-form{
+    display: none;
+}
+html a, html a:hover, html a:focus{
+    color: #000000;
+}
+.cs-search{
+    width: 200px;
+}
+.gray{
+    background-color: #eee;
+}
+#cs-btn-bloqueio{
+    margin: 5px;
+}

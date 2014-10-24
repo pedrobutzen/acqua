@@ -1,0 +1,19 @@
+.bg-blue {
+    background-color: #0c70a4 !important;
+}
+.form-box {
+    width: 360px;
+    margin: 90px auto 0 auto;
+}
+.form-box .header {
+    padding-bottom: 15px;
+}
+.form-box  .form-group {
+    margin-top: 20px;
+}
+.cs-alert{
+    bottom: 30px;
+    right: 50px;
+    position: absolute;
+    z-index: 99999;
+}
