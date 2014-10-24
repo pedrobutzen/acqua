@@ -1,10 +1,10 @@
 <?php
-$menu_page_active = "peca";
+$menu_page_active = "lancamento";
 ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="col-lg-12">
-            <h2>Entrada de Peça <small>Receber, editar e excluir peças do lancaçamentos</small></h2>
+            <h2>Entrada de Peça <small>Receber, editar e excluir peças do lançamento</small></h2>
             <hr>
             <div class="row-fluid">
                 <div class="col-lg-3 cs-p-botton25">

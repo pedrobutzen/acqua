@@ -1114,6 +1114,17 @@ function modal_open(id, pagina, titulo) {
     });
 }
 $(document).ready(function () {
+    $('button.cs-pesquisar').click(function () {
+        var ra = $('input[name=ra]').val();
+        var numero = $('input[name=numero]').val();
+        if (ra === "" && numero === "") {
+            alert_open("danger", "Digite RA ou Número.");
+        } else if (ra !== "") {
+            modal_open(ra, $(this).attr('data-pagina'), "Detalhes do Aluno");
+        } else {
+            modal_open(numero, $(this).attr('data-pagina'), "Detalhes do Aluno");
+        }
+    });
     $('#rm-lancamento').click(function () {
         excluir('lancamento', $(this).attr('data-id'));
         location.href = caminho + 'lancamento';

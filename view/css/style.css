@@ -158,13 +158,7 @@ div#cs-loading{
     z-index: 100;
     text-align: center;
 }
-.cs-form button .cs-editar{
-    display: none;
-}
-.cs-form button .cs-cancelar{
-    display: none;
-}
-input.cs-id-form, .cs-outro-form{
+.cs-form button .cs-editar, #cs-div-editar, .cs-form button .cs-cancelar, input.cs-id-form, .cs-outro-form{
     display: none;
 }
 html a, html a:hover, html a:focus{

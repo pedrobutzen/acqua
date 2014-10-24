@@ -2,19 +2,6 @@
 
 header('Content-type: text/html; charset=UTF-8');
 include_once '../conexao/conexao.php';
-/*
-  for ($i = 0; $i < 25; $i++) {
-  if ($i % 2 == 0) {
-  $permissao_usuario_cadastrar = '0';
-  } else {
-  $permissao_usuario_cadastrar = '1';
-  }
-  $sql = mysqli_query($conect, "INSERT INTO usuario (usuario, nome, senha, quarto, ramal, permissao) VALUES ('usuario." . rand() . "', 'Nome " . rand() . "', '" . rand() . "', NULL, '" . rand() . "', '" . $permissao_usuario_cadastrar . "');");
-  }
-  for ($i = 0; $i < 10; $i++) {
-  $sql = mysqli_query($conect, "INSERT INTO usuario (usuario, nome, senha, quarto, ramal, permissao) VALUES ('usuario." . rand() . "', 'nome " . rand() . "', '" . rand() . "', NULL, '" . rand() . "', '2');");
-  }
- */
 
 $result = array('erro' => false);
 
@@ -115,9 +102,9 @@ if (isset($_SESSION['usuario'])) {
                     //print_r($result);exit;
                     break;
                 case 'montar':
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND idpeca='$action_id'");
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
-                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrado.');
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     } else {
                         $row = mysqli_fetch_array($resultados);
                         $id_peca = $row["idpeca"];
