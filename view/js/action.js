@@ -1,6 +1,7 @@
 var caminho = "http://localhost/acqua/";
 var locale = String(window.location.href);
 locale = locale.split("/");
+var pagina_url = locale[4];
 switch (locale[4]) {
     case 'peca':
         listar('peca', 1, 9);
@@ -811,6 +812,8 @@ function modal_open(id, pagina, titulo) {
         success: function (retorno) {
             if (retorno.erro === false) {
                 var html_body, html_footer;
+
+                var btn_voltar = '<button type="button" class="btn btn-default cs-voltar">Voltar</button>';
                 var btn_editar = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar">Editar</button>';
                 var btn_excluir = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir</button>';
 
@@ -818,8 +821,8 @@ function modal_open(id, pagina, titulo) {
                     var permissao_nome;
                     var btn_reset_senha = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-reset-senha-info">Reiniciar Senha</button>';
 
-                    var btn_alterar_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
-                    var btn_atribuir_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
+                    var btn_alterar_num = '<button type="button" data-id="' + id + '" data-pagina="usuario-aluno" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
+                    var btn_atribuir_num = '<button type="button" data-id="' + id + '" data-pagina="usuario-aluno" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
 
                     var btn_desbloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
                     var btn_bloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
@@ -939,6 +942,58 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = "";
+                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca") {
+                    html_footer = "";
+                    var btn_receber_peca = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-receber-peca">Receber Peça</button>';
+
+                    var btn_alterar_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
+                    var btn_atribuir_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
+
+                    var btn_bloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
+                    var btn_desbloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
+                    var sexo = Array();
+                    sexo["f"] = "Feminino";
+                    sexo["m"] = "Masculino";
+                    switch (pagina) {
+                        case 'usuarioentradapeca':
+                            html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                            html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
+                            html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                            html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
+                            if (retorno[0].num === "") {
+                                html_body += '<li class="gray"><strong>Número:</strong><span id="cs-num-aluno">Aluno sem número</span></li>';
+                            } else {
+                                html_body += '<li><strong>Número:</strong><span id="cs-num-aluno">' + retorno[0].num + '</span></li>';
+                            }
+                            html_body += '<li><strong>Ramal:</strong>' + retorno[0].ramal + '</li>';
+                            html_body += '<li><strong>Quarto:</strong>' + retorno[0].quarto + '</li>';
+                            if (retorno[0].bloqueado === "1") {
+                                html_body += '<li><strong>Status:</strong>Bloqueado</li>';
+                            } else {
+                                html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
+                            }
+                            log(retorno[0].lancamentoativo);
+                            if (retorno[0].lancamentoativo === 0) {
+                                html_body += '<li class="gray"><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
+                            } else {
+                                html_footer = btn_receber_peca;
+                            }
+                            html_body += '</ul>';
+                            if (retorno[0].num === "") {
+                                html_footer += btn_atribuir_num;
+                            } else {
+                                html_footer += btn_alterar_num;
+                            }
+                            if (retorno[0].bloqueado === "" || retorno[0].bloqueado === "0") {
+                                html_footer += btn_bloquear;
+                            } else {
+                                html_footer += btn_desbloquear;
+                            }
+
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 $('.modal-title').html(titulo);
                 $('.modal-body').html(html_body);
@@ -957,7 +1012,9 @@ function modal_open(id, pagina, titulo) {
                         success: function (retorno) {
                             if (retorno.erro === false) {
                                 alert_open("success", "Aluno bloqueado com sucesso.");
-                                listar('usuario-aluno', 1, 9);
+                                if (pagina === "usuario-aluno") {
+                                    listar('usuario-aluno', 1, 9);
+                                }
                             } else {
                                 alert_open("danger", retorno.msg_erro);
                             }
@@ -965,7 +1022,7 @@ function modal_open(id, pagina, titulo) {
                         error: function () {
                             alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
                         }});
-                    $('#cs-modal').modal('hide');
+                    modal_open(id, pagina, titulo);
                 });
                 $('#cs-modal .cs-desbloquear').click(function () {
                     $.ajax({
@@ -980,7 +1037,9 @@ function modal_open(id, pagina, titulo) {
                         success: function (retorno) {
                             if (retorno.erro === false) {
                                 alert_open("success", "Aluno desbloqueado com sucesso.");
-                                listar('usuario-aluno', 1, 9);
+                                if (pagina === "usuario-aluno") {
+                                    listar('usuario-aluno', 1, 9);
+                                }
                             } else {
                                 alert_open("danger", retorno.msg_erro);
                             }
@@ -988,7 +1047,7 @@ function modal_open(id, pagina, titulo) {
                         error: function () {
                             alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
                         }});
-                    $('#cs-modal').modal('hide');
+                    modal_open(id, pagina, titulo);
                 });
                 $('#cs-modal .cs-excluir-info').click(function () {
                     switch ($(this).attr('data-pagina')) {
@@ -1007,7 +1066,10 @@ function modal_open(id, pagina, titulo) {
                     }
                     $('.modal-title').html(titulo);
                     $('.modal-body').html(html_body);
-                    $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                    $('.modal-footer').html(html_footer + btn_voltar + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                    $('#cs-modal .cs-voltar').click(function () {
+                        modal_open(id, pagina, titulo);
+                    });
                     $('#cs-modal .cs-excluir').click(function () {
                         excluir($(this).attr('data-pagina'), $(this).attr('data-id'));
                         $('#cs-modal').modal('hide');
@@ -1059,6 +1121,7 @@ function modal_open(id, pagina, titulo) {
                         },
                         success: function (retorno_alterar) {
                             if (retorno_alterar.erro === false) {
+
                                 var a = 0;
                                 var html_tags = "";
                                 var html_footer = "";
@@ -1077,7 +1140,10 @@ function modal_open(id, pagina, titulo) {
                                 html_tags += '<\select>';
                                 html_footer = '<button type="button" data-id="' + retorno[0].usuario + '" class="btn btn-success cs-alterar-num">Salvar</button>';
                                 $('#cs-num-aluno').html(html_tags);
-                                $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                $('.modal-footer').html(html_footer + btn_voltar + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                $('#cs-modal .cs-voltar').click(function () {
+                                    modal_open(id, pagina, titulo);
+                                });
                                 $('#cs-modal .cs-alterar-num').click(function () {
                                     var usuario_alterar = $(this).attr('data-id');
                                     var novo_numero = $('select[name=novo_numero]').val();
@@ -1093,8 +1159,10 @@ function modal_open(id, pagina, titulo) {
                                         },
                                         success: function (retorno_alterar) {
                                             if (retorno_alterar.erro === false) {
-                                                modal_open(usuario_alterar, 'usuario-aluno', 'Detalhes do Aluno');
-                                                listar('usuario-aluno', 1, 9);
+                                                modal_open(id, pagina, titulo);
+                                                if (pagina === "usuario-aluno") {
+                                                    listar('usuario-aluno', 1, 9);
+                                                }
                                             }
                                         }
                                     });

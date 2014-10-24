@@ -24,7 +24,7 @@ $menu_page_active = "lancamento";
                                     <label>Número</label>
                                     <input name="numero" type="text" class="form-control">
                                 </div>
-                                <button type="button" data-pagina="entradapeca" class="btn btn-primary cs-pesquisar">Pesquisar</button>
+                                <button type="button" data-pagina="usuarioentradapeca" class="btn btn-primary cs-pesquisar">Pesquisar</button>
                                 <button type="button" data-action="limpar" class="btn btn-default cs-limpar">Limpar</button>
                             </div>
 

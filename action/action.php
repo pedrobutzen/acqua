@@ -469,6 +469,59 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
+        case "usuarioentradapeca":
+            switch ($action) {
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
+                    } else {
+                        while ($row = mysqli_fetch_array($resultados)) {
+                            $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
+                            $row1 = mysqli_fetch_array($resultados1);
+                            $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");
+                            if (mysqli_num_rows($resultados2) == 0) {
+                                $haslancamento = 0;
+                            } else {
+                                $row2 = mysqli_fetch_array($resultados2);
+                                $haslancamento = utf8_encode($row2["lancamentoativo"]);
+                            }
+
+                            if (mysqli_num_rows($resultados1) != 0) {
+                                $dados = array(
+                                    'nome' => utf8_encode($row["nome"]),
+                                    'usuario' => utf8_encode($row["usuario"]),
+                                    'sexo' => utf8_encode($row["sexo"]),
+                                    'ramal' => utf8_encode($row["ramal"]),
+                                    'quarto' => utf8_encode($row["quarto"]),
+                                    'num' => utf8_encode($row["num"]),
+                                    'senha' => utf8_encode($row["senha"]),
+                                    'permissao' => utf8_encode($row["permissao"]),
+                                    'bloqueado' => utf8_encode($row1["bloqueado"]),
+                                    'lancamentoativo' => $haslancamento,
+                                );
+                            } else {
+                                $dados = array(
+                                    'nome' => utf8_encode($row["nome"]),
+                                    'usuario' => utf8_encode($row["usuario"]),
+                                    'sexo' => utf8_encode($row["sexo"]),
+                                    'ramal' => utf8_encode($row["ramal"]),
+                                    'quarto' => utf8_encode($row["quarto"]),
+                                    'num' => utf8_encode($row["num"]),
+                                    'senha' => utf8_encode($row["senha"]),
+                                    'permissao' => utf8_encode($row["permissao"]),
+                                    'bloqueado' => '0',
+                                    'lancamentoativo' => $haslancamento,
+                                );
+                            }
+                            array_push($result, $dados);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            break;
         case "usuario-funcionario":
             switch ($action) {
                 case 'cadastrar':
