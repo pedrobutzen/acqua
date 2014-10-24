@@ -44,10 +44,10 @@ $menu_page_active = "usuario";
                                 </select>
                             </div>
                             <div class="well-sm well">A senha padrão criada é <strong>unasp</strong>, no primeiro acesso será solicitada sua alteração.</div>
-                            <button type="button" data-action="editar_usuario" class="btn btn-success cs-editar">Editar</button>
-                            <button type="button" data-action="cadastrar_usuario" class="btn btn-success cs-salvar">Salvar</button>
-                            <button type="reset" data-action="limpar" class="btn btn-warning">Limpar</button>
-                            <button type="button" data-pagina="usuario" class="btn btn-danger cs-cancelar">Cancelar</button>
+                            <button type="button" data-action="editar_usuario" class="btn btn-primary cs-editar">Editar</button>
+                            <button type="button" data-action="cadastrar_usuario" class="btn btn-primary cs-salvar">Salvar</button>
+                            <button type="reset" data-action="limpar" class="btn btn-default">Limpar</button>
+                            <button type="button" data-pagina="usuario" class="btn btn-default cs-cancelar">Cancelar</button>
                         </div>
                     </div>
                 </form>

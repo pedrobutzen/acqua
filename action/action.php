@@ -316,10 +316,10 @@ if (isset($_SESSION['usuario'])) {
                         $row = mysqli_fetch_array($sql_peca);
                         if (mysqli_num_rows($sql_peca) == "0") {
                             mysqli_query($conect, "DELETE FROM lancamento WHERE idlancamento='$id_lancamento'");
-                            $result = array('erro' => true, 'msg_erro' => 'Peça marcada não existe no cadastro.');
+                            $result = array('erro' => true, 'msg_erro' => 'Peça marcada não encontrada.');
                         } elseif ($row['status'] == "0") {
                             mysqli_query($conect, "DELETE FROM lancamento WHERE idlancamento='$id_lancamento'");
-                            $result = array('erro' => true, 'msg_erro' => 'Peça marcada não existe no cadastro.');
+                            $result = array('erro' => true, 'msg_erro' => 'Peça marcada não encontrada.');
                         } else {
                             $sql_insert_peca = mysqli_query($conect, "INSERT INTO lancamento_has_peca (idpeca, idlancamento) VALUES ('$idpeca', '$id_lancamento');");
                         }
@@ -330,7 +330,7 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($sql) == "1") {
                         mysqli_query($conect, "DELETE FROM lancamento WHERE idlancamento='$action_id'");
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontrado.');
                     }
                     break;
                 default:
@@ -505,7 +505,7 @@ if (isset($_SESSION['usuario'])) {
                     $permissao_usuario = utf8_decode($_GET['permissao_usuario']);
                     $sql = mysqli_query($conect, "SELECT nome FROM usuario WHERE usuario='$action_id'");
                     if (mysqli_num_rows($sql) == "0") {
-                        $result = array('erro' => true, 'msg_erro' => 'Usuário não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
                     } else {
                         $sql = mysqli_query($conect, "UPDATE usuario SET usuario='" . $usuario_usuario . "', nome='" . $nome_usuario . "', sexo='" . $sexo_usuario . "', ramal='" . $ramal_usuario . "', permissao='" . $permissao_usuario . "' WHERE usuario='" . $action_id . "';");
                     }
@@ -559,7 +559,7 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($sql) == "1") {
                         $sql = mysqli_query($conect, "DELETE FROM usuario WHERE usuario='$action_id';");
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Usuário não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
                     }
                     break;
                 default:
@@ -675,9 +675,30 @@ if (isset($_SESSION['usuario'])) {
                     }
                     break;
                 case "bloquear":
-
+                    $sql_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id';");
+                    if (mysqli_num_rows($sql_usuario) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
+                    } else {
+                        $sql = mysqli_query($conect, "SELECT * FROM bloqueio WHERE usuario='$action_id' AND ISNULL(data_fim);");
+                        if (mysqli_num_rows($sql) > 0) {
+                            $result = array('erro' => true, 'msg_erro' => 'Usuário já possui bloqueio ativo.');
+                        } else {
+                            mysqli_query($conect, "INSERT INTO bloqueio (data_inicio, usuario) VALUES (NOW(), '$action_id');");
+                        }
+                    }
                     break;
                 case "desbloquear":
+                    $sql_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id';");
+                    if (mysqli_num_rows($sql_usuario) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
+                    } else {
+                        $sql = mysqli_query($conect, "SELECT * FROM bloqueio WHERE usuario='$action_id' AND ISNULL(data_fim);");
+                        if (mysqli_num_rows($sql) > 0) {
+                            mysqli_query($conect, "UPDATE bloqueio SET data_fim=NOW(), usuario_desbloqueio='$usuario_logado' WHERE usuario='$action_id' AND ISNULL(data_fim);");
+                        } else {
+                            $result = array('erro' => true, 'msg_erro' => 'Usuário não já possui bloqueio ativo.');
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -688,7 +709,7 @@ if (isset($_SESSION['usuario'])) {
                 case 'reset_senha':
                     $sql = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id'");
                     if (mysqli_num_rows($sql) == "0") {
-                        $result = array('erro' => true, 'msg_erro' => 'Usuário não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
                     } else {
                         $sql = mysqli_query($conect, "UPDATE usuario SET senha='unasp' WHERE usuario='$action_id';");
                     }
@@ -774,7 +795,7 @@ if (isset($_SESSION['usuario'])) {
                     $novo_numero = utf8_decode($_GET['novo_numero']);
                     $sql = mysqli_query($conect, "SELECT nome FROM usuario WHERE usuario='$usuario'");
                     if (mysqli_num_rows($sql) == "0") {
-                        $result = array('erro' => true, 'msg_erro' => 'Usuário não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
                     } else {
                         $sql = mysqli_query($conect, "UPDATE usuario SET num='$novo_numero'WHERE usuario='$usuario';");
                     }
@@ -784,7 +805,7 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($sql) == 1) {
                         $sql = mysqli_query($conect, "DELETE FROM num_lavanderia WHERE num='$action_id';");
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Número não existe.');
+                        $result = array('erro' => true, 'msg_erro' => 'Número não encontrado.');
                     }
                     break;
                 default:
@@ -865,7 +886,7 @@ if (isset($_SESSION['usuario'])) {
         $usuario_logar_senha = utf8_decode($_GET['usuario_logar_senha']);
         $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$usuario_logar_usuario';");
         if (mysqli_num_rows($resultados) == 0) {
-            $result = array('erro' => true, 'msg_erro' => 'Usuário não existe.');
+            $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
         } else {
             $row = mysqli_fetch_assoc($resultados);
             if ($usuario_logar_usuario == utf8_encode($row['usuario']) && $usuario_logar_senha == utf8_encode($row['senha'])) {
