@@ -469,53 +469,108 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
+        case "entradapeca":
+            switch ($action) {
+                case 'listar':
+                    $pag = utf8_decode($_GET['listar_pag']);
+                    $maximo = utf8_decode($_GET['listar_qtd_itens']);
+                    $inicio = ($pag * $maximo) - $maximo;
+                    $qtd_geral_sql = mysqli_query($conect, "SELECT peca.* FROM peca JOIN(lancamento_has_peca) ON(peca.idpeca=lancamento_has_peca.idpeca AND lancamento_has_peca.idlancamento='$action_id')");
+                    $qtd_geral = mysqli_num_rows($qtd_geral_sql);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral
+                    );
+                    array_push($result, $qtd_array);
+
+                    $peca_sql = mysqli_query($conect, "SELECT peca.* FROM peca JOIN(lancamento_has_peca) ON(peca.idpeca=lancamento_has_peca.idpeca AND lancamento_has_peca.idlancamento='$action_id') ORDER BY peca.descricao LIMIT $inicio, $maximo");
+
+                    if (mysqli_num_rows($peca_sql) > 0) {
+                        while ($row = mysqli_fetch_array($peca_sql)) {
+                            $id_tipo = $row["idtipo"];
+                            $resultados2 = mysqli_query($conect, "SELECT nome FROM tipo WHERE idtipo='$id_tipo'");
+                            $row2 = mysqli_fetch_array($resultados2);
+                            $dados = array(
+                                'idpeca' => utf8_encode($row["idpeca"]),
+                                'descricao' => utf8_encode($row["descricao"]),
+                                'marca' => utf8_encode($row["marca"]),
+                                'cor' => utf8_encode($row["cor"]),
+                                'tamanho' => utf8_encode($row["tamanho"]),
+                                'nometipo' => utf8_encode($row2["nome"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    }
+                    break;
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados);
+                        $dados = array(
+                            'idpeca' => utf8_encode($row["idpeca"]),
+                            'descricaopeca' => utf8_encode($row["descricao"]),
+                            'marca' => utf8_encode($row["marca"]),
+                            'cor' => utf8_encode($row["cor"]),
+                            'tamanho' => utf8_encode($row["tamanho"]),
+                            'idtipo' => utf8_encode($row["idtipo"]),
+                            'nometipo' => utf8_encode($row["nometipo"]),
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                default :
+                    break;
+            }
+            break;
         case "usuarioentradapeca":
             switch ($action) {
                 case 'montar':
-                    $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id'");
-                    if (mysqli_num_rows($resultados) == 0) {
+                    $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
+                    if (mysqli_num_rows($resultados_usuario) == 0) {
+                        $resultados_usuario = NULL;
                         $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
                     } else {
-                        while ($row = mysqli_fetch_array($resultados)) {
-                            $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
-                            $row1 = mysqli_fetch_array($resultados1);
-                            $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");
-                            if (mysqli_num_rows($resultados2) == 0) {
-                                $haslancamento = 0;
-                            } else {
-                                $row2 = mysqli_fetch_array($resultados2);
-                                $haslancamento = utf8_encode($row2["lancamentoativo"]);
-                            }
-
-                            if (mysqli_num_rows($resultados1) != 0) {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'permissao' => utf8_encode($row["permissao"]),
-                                    'bloqueado' => utf8_encode($row1["bloqueado"]),
-                                    'lancamentoativo' => $haslancamento,
-                                );
-                            } else {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'permissao' => utf8_encode($row["permissao"]),
-                                    'bloqueado' => '0',
-                                    'lancamentoativo' => $haslancamento,
-                                );
-                            }
-                            array_push($result, $dados);
+                        $row = mysqli_fetch_array($resultados_usuario);
+                        $action_id = $row['usuario'];
+                        $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
+                        $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");
+                        if (mysqli_num_rows($resultados2) == 0) {
+                            $haslancamento = 0;
+                        } else {
+                            $row2 = mysqli_fetch_array($resultados2);
+                            $haslancamento = utf8_encode($row2["lancamentoativo"]);
                         }
+
+                        if (mysqli_num_rows($resultados1) != 0) {
+                            $row1 = mysqli_fetch_array($resultados1);
+                            $dados = array(
+                                'nome' => utf8_encode($row["nome"]),
+                                'usuario' => utf8_encode($row["usuario"]),
+                                'sexo' => utf8_encode($row["sexo"]),
+                                'ramal' => utf8_encode($row["ramal"]),
+                                'quarto' => utf8_encode($row["quarto"]),
+                                'num' => utf8_encode($row["num"]),
+                                'senha' => utf8_encode($row["senha"]),
+                                'permissao' => utf8_encode($row["permissao"]),
+                                'bloqueado' => utf8_encode($row1["bloqueado"]),
+                                'lancamentoativo' => $haslancamento,
+                            );
+                        } else {
+                            $dados = array(
+                                'nome' => utf8_encode($row["nome"]),
+                                'usuario' => utf8_encode($row["usuario"]),
+                                'sexo' => utf8_encode($row["sexo"]),
+                                'ramal' => utf8_encode($row["ramal"]),
+                                'quarto' => utf8_encode($row["quarto"]),
+                                'num' => utf8_encode($row["num"]),
+                                'senha' => utf8_encode($row["senha"]),
+                                'permissao' => utf8_encode($row["permissao"]),
+                                'bloqueado' => '0',
+                                'lancamentoativo' => $haslancamento,
+                            );
+                        }
+                        array_push($result, $dados);
                     }
                     break;
                 default:
@@ -619,9 +674,7 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
 
-                    $ids[] = "0";
-
-                    $resultados = mysqli_query($conect, "SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario LEFT JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND !ISNULL(bloqueio.data_inicio) AND ISNULL(bloqueio.data_fim) ORDER BY nome, num LIMIT $inicio, $maximo");
+                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION ALL (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim))  ORDER BY bloqueado DESC, num ASC LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) != 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
                             $dados = array(
@@ -635,47 +688,9 @@ if (isset($_SESSION['usuario'])) {
                                 'bloqueado' => utf8_encode($row["bloqueado"]),
                             );
                             array_push($result, $dados);
-                            $ids[] = $row["usuario"];
                         }
                     }
-                    $resultados2 = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao='3' AND ISNULL(num) ORDER BY nome, num LIMIT $inicio, $maximo");
-                    if (mysqli_num_rows($resultados2) != 0) {
-                        while ($row = mysqli_fetch_array($resultados2)) {
-                            if (!in_array($row['usuario'], $ids)) {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'bloqueado' => '0',
-                                );
-                                array_push($result, $dados);
-                                $ids[] = $row["usuario"];
-                            }
-                        }
-                    }
-                    $resultados3 = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao='3' AND !ISNULL(num) ORDER BY nome, num LIMIT $inicio, $maximo");
-                    if (mysqli_num_rows($resultados3) != 0) {
-                        while ($row = mysqli_fetch_array($resultados3)) {
-                            if (!in_array($row['usuario'], $ids)) {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'bloqueado' => '0',
-                                );
-                                array_push($result, $dados);
-                            }
-                        }
-                    }
-
+                    //print_r($result);exit;
                     break;
                 case 'montar':
                     $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id'");

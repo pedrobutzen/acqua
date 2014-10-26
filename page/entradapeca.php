@@ -83,7 +83,6 @@ $menu_page_active = "lancamento";
                                     <th>Marca</th>
                                     <th>Cor</th>
                                     <th>Tamanho</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody id="cs-dataGrid" class="cs-with-modal">

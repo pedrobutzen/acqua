@@ -2,9 +2,10 @@ var caminho = "http://localhost/acqua/";
 var locale = String(window.location.href);
 locale = locale.split("/");
 var pagina_url = locale[4];
+var action_id_local = "";
 switch (locale[4]) {
     case 'peca':
-        listar('peca', 1, 9);
+        listar('peca', 1, 10);
         function cadastrar_peca() {
             var descricao = $('input[name=descricao]').val();
             var marca = $('input[name=marca]').val();
@@ -32,7 +33,7 @@ switch (locale[4]) {
                     },
                     success: function (retorno) {
                         if (retorno.erro === false) {
-                            listar('peca', 1, 9);
+                            listar('peca', 1, 10);
                             alert_open("success", "Cadastrado com sucesso.");
                             $('#cs-form input').val('');
                             $('#cs-form select').val('');
@@ -76,7 +77,7 @@ switch (locale[4]) {
                     },
                     success: function (retorno) {
                         if (retorno.erro === false) {
-                            listar('peca', 1, 9);
+                            listar('peca', 1, 10);
                             alert_open("success", "Peça editada com sucesso.");
                             limpar_form_cadastro();
                         } else {
@@ -91,7 +92,7 @@ switch (locale[4]) {
         }
         break;
     case 'ocorrencia':
-        listar('ocorrencia', 1, 9);
+        listar('ocorrencia', 1, 10);
         break;
     case 'lancamento':
         $(document).ready(function () {
@@ -171,13 +172,13 @@ switch (locale[4]) {
         }
         break;
     case 'lancamentoativo':
-        listar('lancamentoativo', 1, 9);
+        listar('lancamentoativo', 1, 10);
         break;
     case 'lancamentospassados':
-        listar('lancamentospassados', 1, 9);
+        listar('lancamentospassados', 1, 10);
         break;
     case 'usuario':
-        listar('usuario-funcionario', 1, 9);
+        listar('usuario-funcionario', 1, 10);
         function cadastrar_usuario_funcionario() {
             var nome_usuario = $('input[name=usuario_nome]').val();
             var usuario_usuario = $('input[name=usuario_usuario]').val();
@@ -201,7 +202,7 @@ switch (locale[4]) {
                     },
                     success: function (retorno) {
                         if (retorno.erro === false) {
-                            listar('usuario-funcionario', 1, 9);
+                            listar('usuario-funcionario', 1, 10);
                             alert_open("success", "Cadastrado com sucesso.");
                             $('#cs-form input').val('');
                         } else {
@@ -238,7 +239,7 @@ switch (locale[4]) {
                     },
                     success: function (retorno) {
                         if (retorno.erro === false) {
-                            listar('usuario-funcionario', 1, 9);
+                            listar('usuario-funcionario', 1, 10);
                             alert_open("success", "Usuário editado com sucesso.");
                             limpar_form_cadastro();
                         } else {
@@ -253,7 +254,7 @@ switch (locale[4]) {
         }
         break;
     case 'numero':
-        listar('numero_feminino', 1, 9);
+        listar('numero_feminino', 1, 10);
         function cadastrar_numero() {
             var num_numero = $('input[name=num_numero]').val();
             var num_sexo = $('select[name=num_sexo]').find(":selected").val();
@@ -277,13 +278,13 @@ switch (locale[4]) {
                                     $('.cs-li-masculino').removeClass('active');
                                     $('.cs-li-feminino').addClass('active');
                                 }
-                                listar('numero_feminino', 1, 9);
+                                listar('numero_feminino', 1, 10);
                             } else {
                                 if (!$('.cs-li-masculino').hasClass('active')) {
                                     $('.cs-li-feminino').removeClass('active');
                                     $('.cs-li-masculino').addClass('active');
                                 }
-                                listar('numero_masculino', 1, 9);
+                                listar('numero_masculino', 1, 10);
                             }
                             alert_open("success", "Cadastrado com sucesso.");
                             $('#cs-form input').val('');
@@ -300,7 +301,7 @@ switch (locale[4]) {
         }
         break;
     case 'atribuirnumero':
-        listar('numero_feminino', 1, 9);
+        listar('numero_feminino', 1, 10);
         function atribuir_numero_auto() {
             var sexo = $('select[name=num_sexo]').find(":selected").val();
             if (sexo === "") {
@@ -327,13 +328,13 @@ switch (locale[4]) {
                                 $('.cs-li-masculino').removeClass('active');
                                 $('.cs-li-feminino').addClass('active');
                             }
-                            listar('numero_feminino', 1, 9);
+                            listar('numero_feminino', 1, 10);
                         } else {
                             if (!$('.cs-li-masculino').hasClass('active')) {
                                 $('.cs-li-feminino').removeClass('active');
                                 $('.cs-li-masculino').addClass('active');
                             }
-                            listar('numero_masculino', 1, 9);
+                            listar('numero_masculino', 1, 10);
                         }
                     },
                     error: function () {
@@ -343,13 +344,13 @@ switch (locale[4]) {
                                 $('.cs-li-masculino').removeClass('active');
                                 $('.cs-li-feminino').addClass('active');
                             }
-                            listar('numero_feminino', 1, 9);
+                            listar('numero_feminino', 1, 10);
                         } else {
                             if (!$('.cs-li-masculino').hasClass('active')) {
                                 $('.cs-li-feminino').removeClass('active');
                                 $('.cs-li-masculino').addClass('active');
                             }
-                            listar('numero_masculino', 1, 9);
+                            listar('numero_masculino', 1, 10);
                         }
                     }
                 });
@@ -388,7 +389,7 @@ function cadastrar_livro() {
             },
             success: function (retorno) {
                 if (retorno.erro === false) {
-                    listar('livro', 1, 9);
+                    listar('livro', 1, 10);
                     $('span#cs-message-success').text("Cadastrado com sucesso.");
                     $('div#cs-alert-danger').hide();
                     $('div#cs-alert-success').show();
@@ -424,7 +425,7 @@ function editar_livro() {
             },
             success: function (retorno) {
                 if (retorno.erro === false) {
-                    listar('livro', 1, 9);
+                    listar('livro', 1, 10);
                     $('span#cs-message-success').text("Editado com sucesso.");
                     $('div#cs-alert-danger').hide();
                     $('div#cs-alert-success').show();
@@ -503,7 +504,6 @@ function deslogar() {
 // ------- GERAL -------
 function listar(action_pagina, pagina_paginacao, qtd_itens) {
     limpar_form_cadastro();
-    $('div#cs-loading').fadeIn(100);
     $.ajax({
         type: 'GET',
         url: 'action/action.php',
@@ -512,7 +512,8 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
             action_pagina: action_pagina,
             action: "listar",
             listar_pag: pagina_paginacao,
-            listar_qtd_itens: qtd_itens
+            listar_qtd_itens: qtd_itens,
+            action_id: action_id_local
         },
         success: function (retorno) {
             var html_tags = "";
@@ -543,6 +544,12 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             } else {
                                 html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="ocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             }
+                        }
+                        break;
+                    case "entradapeca":
+                        $('div.cs-legenda').html('');
+                        for (var j = 1; j < a - 1; j++) {
+                            html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="entradapeca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td></tr>';
                         }
                         break;
                     case "lancamentoativo":
@@ -639,6 +646,9 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                     var titulo_modal;
                     switch ($(this).attr('data-pagina')) {
                         case 'peca':
+                            titulo_modal = 'Detalhes de Peça';
+                            break;
+                        case 'entradapeca':
                             titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'ocorrencia':
@@ -740,7 +750,7 @@ function excluir(pagina, id) {
             action_id: id
         },
         success: function (retorno) {
-            listar(pagina, 1, 9);
+            listar(pagina, 1, 10);
             if (retorno.erro === "success") {
                 alert_open("success", retorno.msg_status);
             } else if (retorno.erro === false) {
@@ -759,18 +769,15 @@ function paginar(action_pagina, pagina_paginacao, qtd_itens_por_pagina, qtd_gera
     if (qtd_geral > qtd_itens_por_pagina) {
         $('#cs-pagination-content').html('<ul class="pagination" id="cs-pagination"></ul>');
         if (pagina_paginacao !== 1) {
-            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + (pagina_paginacao - 1) + '" data-qtd-itens="' + qtd_itens_por_pagina + '">«</a></li>');
+            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="1" data-qtd-itens="' + qtd_itens_por_pagina + '">«</a></li>');
+            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + (pagina_paginacao - 1) + '" data-qtd-itens="' + qtd_itens_por_pagina + '">‹</a></li>');
         }
         var qtdpaginas = Math.ceil(qtd_geral / qtd_itens_por_pagina);
-        for (var i = 1; i <= qtdpaginas; i++) {
-            if (pagina_paginacao === i) {
-                $('#cs-pagination').append('<li class="active"><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + i + '" data-qtd-itens="' + qtd_itens_por_pagina + '">' + i + '</a></li>');
-            } else {
-                $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + i + '" data-qtd-itens="' + qtd_itens_por_pagina + '">' + i + '</a></li>');
-            }
-        }
+        $('#cs-pagination').append('<li class="active"><span>' + pagina_paginacao + ' de ' + qtdpaginas + '<span class="sr-only">(current)</span></span></li>');
+
         if (pagina_paginacao !== qtdpaginas) {
-            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + (pagina_paginacao + 1) + '" data-qtd-itens="' + qtd_itens_por_pagina + '">»</a></li>');
+            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + (pagina_paginacao + 1) + '" data-qtd-itens="' + qtd_itens_por_pagina + '">›</a></li>');
+            $('#cs-pagination').append('<li><a href="javascript:;" data-pagina="' + action_pagina + '" data-paginacao="' + qtdpaginas + '" data-qtd-itens="' + qtd_itens_por_pagina + '">»</a></li>');
         }
     } else {
         $('#cs-pagination-content').html('');
@@ -816,7 +823,9 @@ function modal_open(id, pagina, titulo) {
                 var btn_voltar = '<button type="button" class="btn btn-default cs-voltar">Voltar</button>';
                 var btn_editar = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar">Editar</button>';
                 var btn_excluir = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir</button>';
-
+                var sexo = Array();
+                sexo["f"] = "Feminino";
+                sexo["m"] = "Masculino";
                 if (pagina === "usuario-aluno" || pagina === "usuario-funcionario") {
                     var permissao_nome;
                     var btn_reset_senha = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-reset-senha-info">Reiniciar Senha</button>';
@@ -840,9 +849,6 @@ function modal_open(id, pagina, titulo) {
                             permissao_nome = 'Permissão não identificada';
                             break;
                     }
-                    var sexo = Array();
-                    sexo["f"] = "Feminino";
-                    sexo["m"] = "Masculino";
                     switch (pagina) {
                         case 'usuario-funcionario':
                             html_body = '<ul class="list-unstyled" id="cs-list-modal">';
@@ -951,9 +957,6 @@ function modal_open(id, pagina, titulo) {
 
                     var btn_bloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
                     var btn_desbloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
-                    var sexo = Array();
-                    sexo["f"] = "Feminino";
-                    sexo["m"] = "Masculino";
                     switch (pagina) {
                         case 'usuarioentradapeca':
                             html_body = '<ul class="list-unstyled" id="cs-list-modal">';
@@ -972,7 +975,6 @@ function modal_open(id, pagina, titulo) {
                             } else {
                                 html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
                             }
-                            log(retorno[0].lancamentoativo);
                             if (retorno[0].lancamentoativo === 0) {
                                 html_body += '<li class="gray"><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
                             } else {
@@ -989,16 +991,33 @@ function modal_open(id, pagina, titulo) {
                             } else {
                                 html_footer += btn_desbloquear;
                             }
-
+                            action_id_local = retorno[0].lancamentoativo;
                             break;
                         default:
                             break;
                     }
+                } else if (pagina === "entradapeca") {
+                    var btn_editar_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
+                    var btn_excluir_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-peca-lancamento">Excluir do Lançamento</button>';
+                    
+                    html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                    html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
+                    html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
+                    html_body += '<li><strong>Cor:</strong>' + retorno[0].cor + '</li>';
+                    html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
+                    html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
+                    html_body += '</ul>';
+                    
+                    html_footer = btn_editar_peca_lancamento + btn_excluir_peca_lancamento;
                 }
                 $('.modal-title').html(titulo);
                 $('.modal-body').html(html_body);
                 $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                 $('#cs-modal').modal('show');
+                $('button.cs-receber-peca').click(function () {
+                    listar('entradapeca', 1, 10);
+                    $('#cs-modal').modal('hide');
+                });
                 $('#cs-modal .cs-bloquear').click(function () {
                     $.ajax({
                         type: 'GET',
@@ -1013,7 +1032,7 @@ function modal_open(id, pagina, titulo) {
                             if (retorno.erro === false) {
                                 alert_open("success", "Aluno bloqueado com sucesso.");
                                 if (pagina === "usuario-aluno") {
-                                    listar('usuario-aluno', 1, 9);
+                                    listar('usuario-aluno', 1, 10);
                                 }
                             } else {
                                 alert_open("danger", retorno.msg_erro);
@@ -1038,7 +1057,7 @@ function modal_open(id, pagina, titulo) {
                             if (retorno.erro === false) {
                                 alert_open("success", "Aluno desbloqueado com sucesso.");
                                 if (pagina === "usuario-aluno") {
-                                    listar('usuario-aluno', 1, 9);
+                                    listar('usuario-aluno', 1, 10);
                                 }
                             } else {
                                 alert_open("danger", retorno.msg_erro);
@@ -1161,7 +1180,7 @@ function modal_open(id, pagina, titulo) {
                                             if (retorno_alterar.erro === false) {
                                                 modal_open(id, pagina, titulo);
                                                 if (pagina === "usuario-aluno") {
-                                                    listar('usuario-aluno', 1, 9);
+                                                    listar('usuario-aluno', 1, 10);
                                                 }
                                             }
                                         }
@@ -1211,22 +1230,22 @@ $(document).ready(function () {
         }
     });
     $('a#cs-dataGrid-funcionario').click(function () {
-        listar('usuario-funcionario', 1, 9);
+        listar('usuario-funcionario', 1, 10);
         $('.cs-li-aluno').removeClass('active');
         $('.cs-li-funcionario').addClass('active');
     });
     $('a#cs-dataGrid-aluno').click(function () {
-        listar('usuario-aluno', 1, 9);
+        listar('usuario-aluno', 1, 10);
         $('.cs-li-funcionario').removeClass('active');
         $('.cs-li-aluno').addClass('active');
     });
     $('a#cs-dataGrid-num-m').click(function () {
-        listar('numero_masculino', 1, 9);
+        listar('numero_masculino', 1, 10);
         $('.cs-li-feminino').removeClass('active');
         $('.cs-li-masculino').addClass('active');
     });
     $('a#cs-dataGrid-num-f').click(function () {
-        listar('numero_feminino', 1, 9);
+        listar('numero_feminino', 1, 10);
         $('.cs-li-masculino').removeClass('active');
         $('.cs-li-feminino').addClass('active');
     });
