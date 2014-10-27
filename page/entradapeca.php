@@ -91,6 +91,7 @@ $menu_page_active = "lancamento";
                         <div class="pull-right cs-legenda"></div>
                         <div class="col-lg-12 text-center" id="cs-pagination-content"></div>
                     </div>
+                    <span style="float: right;" id="botao-rigth"></span>
                 </div>
             </div>
         </div><!-- /.col-lg-12 -->

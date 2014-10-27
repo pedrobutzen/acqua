@@ -548,9 +548,37 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         break;
                     case "entradapeca":
                         $('div.cs-legenda').html('');
+                        $('span#botao-rigth').html('<button type="button" class="btn btn-primary cs-entradapecalancamento-info" >Confirmar Entrada</button>');
                         for (var j = 1; j < a - 1; j++) {
                             html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="entradapeca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td></tr>';
                         }
+                        $('button.cs-entradapecalancamento-info').click(function () {
+                            modal_info('Deseja realmente confirmar a entrada das peças da lista?', 'Não será mais possível editar nem remover peças deste lancamento.', '<button type="button" class="btn btn-primary cs-entradapecalancamento">Confirmar</button>');
+                            $('button.cs-entradapecalancamento').click(function () {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'action/action.php',
+                                    dataType: 'json',
+                                    data: {
+                                        action_pagina: 'entradapeca',
+                                        action: "confirmar"
+                                    },
+                                    success: function (retorno) {
+                                        if (retorno.erro === false) {
+                                            alert_open("success", "Entrada de lançamento confirmada com sucesso.");
+                                            $('#cs-dataGrid').html("");
+                                            $('#botao-rigth').html("");
+                                            $('#cs-modal').modal('hide');
+                                        } else {
+                                            alert_open("danger", retorno.msg_erro);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                    }
+                                });
+                            });
+                        });
                         break;
                     case "lancamentoativo":
                         for (var j = 1; j < a - 1; j++) {
@@ -688,7 +716,6 @@ function limpar_form_cadastro() {
     $('button.cs-editar').hide();
     $('button.cs-salvar').show();
     $('panel-body.cs-id-editar span').html('');
-    $('span#cs-action').text("Cadastrar");
 }
 function pre_editar(pagina, id) {
     $('div#cs-alert-danger').hide();
@@ -806,7 +833,14 @@ function alert_close(tipo) {
         $('div#cs-alert-success').hide();
     }
 }
+function modal_info(titulo, corpo, rodape) {
+    $('.modal-title').html(titulo);
+    $('.modal-body').html(corpo);
+    $('.modal-footer').html(rodape + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+    $('#cs-modal').modal('show');
+}
 function modal_open(id, pagina, titulo) {
+    var titulo_oficial = titulo;
     $.ajax({
         type: 'GET',
         url: 'action/action.php',
@@ -976,7 +1010,9 @@ function modal_open(id, pagina, titulo) {
                                 html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
                             }
                             if (retorno[0].lancamentoativo === 0) {
-                                html_body += '<li class="gray"><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
+                                html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
+                            } else if (retorno[0].lancamentoativo === -1) {
+                                html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno já possui peças na lavanderia</li>';
                             } else {
                                 html_footer = btn_receber_peca;
                             }
@@ -998,8 +1034,8 @@ function modal_open(id, pagina, titulo) {
                     }
                 } else if (pagina === "entradapeca") {
                     var btn_editar_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
-                    var btn_excluir_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-peca-lancamento">Excluir do Lançamento</button>';
-                    
+                    var btn_excluir_peca_lancamento = '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
+
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
                     html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
@@ -1007,7 +1043,7 @@ function modal_open(id, pagina, titulo) {
                     html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
                     html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
                     html_body += '</ul>';
-                    
+
                     html_footer = btn_editar_peca_lancamento + btn_excluir_peca_lancamento;
                 }
                 $('.modal-title').html(titulo);
@@ -1069,11 +1105,90 @@ function modal_open(id, pagina, titulo) {
                     modal_open(id, pagina, titulo);
                 });
                 $('#cs-modal .cs-excluir-info').click(function () {
+                    titulo = "";
+                    html_body = "";
+                    html_footer = "";
                     switch ($(this).attr('data-pagina')) {
                         case "peca":
                             titulo = "Deseja realmente excluir a peça selecionada?";
                             html_body = "Não será possível recuperá-la.";
                             html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Excluir</button>';
+                            break;
+                        case "entradapeca":
+                            $.ajax({
+                                type: 'GET',
+                                url: 'action/action.php',
+                                dataType: 'json',
+                                data: {
+                                    action_pagina: 'entradapeca',
+                                    action: "pegarlogado"
+                                },
+                                success: function (retorno) {
+                                    if (retorno.erro === false) {
+                                        if (retorno.status === 0) {
+                                            titulo = "Digite a senha para autorização - Aluno";
+                                            html_body = '<form class="form-horizontal" role="form"><div class="form-group"><label class="col-sm-2 control-label">RA</label><div class="col-sm-10"><p class="form-control-static">' + retorno.usuario + '</p></div></div><div class="form-group"><label for="inputPassword" class="col-sm-2 control-label">Senha</label><div class="col-sm-10"><input type="password" name="senha" class="form-control" id="inputPassword" placeholder="Senha"></div></div></form>';
+                                            //html_body = '<strong>Usuário: </strong>' + retorno.usuario + '<br><input type="password" name="senha" class="form-control" placeholder="Senha">';
+                                            html_footer = '<button type="button" class="btn btn-primary cs-autorizar">Autorizar</button>';
+                                        } else {
+                                            titulo = "Deseja realmente remover  do lançamento a peça selecionada?";
+                                            html_body = "A peça será excluída apenas deste lancamento, ela continuará na lista de peças do aluno.";
+                                            html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Remover</button>';
+                                        }
+                                        $('.modal-title').html(titulo);
+                                        $('.modal-body').html(html_body);
+                                        $('.modal-footer').html(html_footer + btn_voltar + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                        $('#cs-modal .cs-voltar').click(function () {
+                                            modal_open(id, pagina, titulo_oficial);
+                                        });
+                                        $('#cs-modal .cs-excluir').click(function () {
+                                            excluir($(this).attr('data-pagina'), $(this).attr('data-id'));
+                                            $('#cs-modal').modal('hide');
+                                        });
+                                        $('#cs-modal .cs-autorizar').click(function () {
+                                            if ($('input[name=senha]').val() === "") {
+                                                alert_open("danger", "O campo senha é obrigatório.");
+                                            } else {
+                                                $.ajax({
+                                                    type: 'GET',
+                                                    url: 'action/action.php',
+                                                    dataType: 'json',
+                                                    data: {
+                                                        action_pagina: 'entradapeca',
+                                                        action: "logarusuario",
+                                                        senha: $('input[name=senha]').val()
+                                                    },
+                                                    success: function (retorno) {
+                                                        if (retorno.erro === false) {
+                                                            alert_open("success", "Usuário autorizado a fazer alterações.");
+                                                            titulo = "Deseja realmente remover  do lançamento a peça selecionada?";
+                                                            html_body = "A peça será excluída apenas deste lancamento, ela continuará na lista de peças do aluno.";
+                                                            html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Remover</button>';
+                                                            $('.modal-title').html(titulo);
+                                                            $('.modal-body').html(html_body);
+                                                            $('.modal-footer').html(html_footer + btn_voltar + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                                            $('#cs-modal .cs-voltar').click(function () {
+                                                                modal_open(id, pagina, titulo_oficial);
+                                                            });
+                                                            $('#cs-modal .cs-excluir').click(function () {
+                                                                excluir($(this).attr('data-pagina'), $(this).attr('data-id'));
+                                                                $('#cs-modal').modal('hide');
+                                                            });
+                                                        } else {
+                                                            alert_open("danger", retorno.msg_erro);
+                                                        }
+                                                    },
+                                                    error: function () {
+                                                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        alert_open("danger", retorno.msg_erro);
+                                    }
+                                }
+                            });
                             break;
                         case "usuario-funcionario":
                             titulo = "Deseja realmente excluir o funcionario selecionado?";
@@ -1087,7 +1202,7 @@ function modal_open(id, pagina, titulo) {
                     $('.modal-body').html(html_body);
                     $('.modal-footer').html(html_footer + btn_voltar + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                     $('#cs-modal .cs-voltar').click(function () {
-                        modal_open(id, pagina, titulo);
+                        modal_open(id, pagina, titulo_oficial);
                     });
                     $('#cs-modal .cs-excluir').click(function () {
                         excluir($(this).attr('data-pagina'), $(this).attr('data-id'));

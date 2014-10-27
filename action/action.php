@@ -519,6 +519,55 @@ if (isset($_SESSION['usuario'])) {
                         array_push($result, $dados);
                     }
                     break;
+                case 'excluir':
+                    $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
+                    $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND ISNULL(data_recebimento);");
+                    $row = mysqli_fetch_array($sql_select_lancamento);
+                    $idlancamento = $row['idlancamento'];
+                    $sql = mysqli_query($conect, "SELECT idpeca FROM lancamento_has_peca WHERE idpeca='$action_id' AND idlancamento='$idlancamento'");
+                    if (mysqli_num_rows($sql) == 1) {
+                        mysqli_query($conect, "DELETE FROM lancamento_has_peca WHERE idpeca='$action_id' AND idlancamento='$idlancamento';");
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Peça não encontrada.');
+                    }
+                    break;
+                case 'confirmar':
+                    $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
+                    $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND ISNULL(data_recebimento);");
+
+                    if (mysqli_num_rows($sql_select_lancamento) == 1) {
+                        $row = mysqli_fetch_array($sql_select_lancamento);
+                        $idlancamento = $row['idlancamento'];
+                        mysqli_query($conect, "UPDATE lancamento SET data_recebimento=NOW(), usuario_recebimento='$usuario_logado' WHERE idlancamento='$idlancamento';");
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontrado.');
+                    }
+                    break;
+                case 'logarusuario':
+                    $usuario = $_SESSION['usuarioentrada']['usuario'];
+                    $senha = utf8_decode($_GET['senha']);
+                    $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$usuario' AND permissao='3';");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
+                    } else {
+                        $row = mysqli_fetch_assoc($resultados);
+                        if ($usuario == utf8_encode($row['usuario']) && $senha == utf8_encode($row['senha'])) {
+                            session_cache_expire(720);
+                            $_SESSION['usuarioentrada']['status'] = 1;
+                            $result = array('erro' => false);
+                        } else {
+                            $result = array('erro' => true, 'msg_erro' => 'Senha digitada está incorreta.');
+                        }
+                    }
+                    break;
+                case 'pegarlogado':
+                    // unset($_SESSION['usuarioentrada']);
+                    if (isset($_SESSION['usuarioentrada'])) {
+                        $result = array('erro' => false, 'usuario' => $_SESSION['usuarioentrada']['usuario'], 'status' => $_SESSION['usuarioentrada']['status']);
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário entrou.');
+                    }
+                    break;
                 default :
                     break;
             }
@@ -532,14 +581,20 @@ if (isset($_SESSION['usuario'])) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
                     } else {
                         $row = mysqli_fetch_array($resultados_usuario);
+                        $_SESSION['usuarioentrada']['usuario'] = $row['usuario'];
+                        $_SESSION['usuarioentrada']['status'] = 0;
+                        $usuario_entrada = $row['usuario'];
                         $action_id = $row['usuario'];
                         $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
                         $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");
-                        if (mysqli_num_rows($resultados2) == 0) {
-                            $haslancamento = 0;
-                        } else {
+                        $resultados3 = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$action_id' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
+                        if (mysqli_num_rows($resultados2) > 0) {
                             $row2 = mysqli_fetch_array($resultados2);
                             $haslancamento = utf8_encode($row2["lancamentoativo"]);
+                        } elseif (mysqli_num_rows($resultados3) > 0) {
+                            $haslancamento = -1;
+                        } else {
+                            $haslancamento = 0;
                         }
 
                         if (mysqli_num_rows($resultados1) != 0) {
@@ -775,7 +830,6 @@ if (isset($_SESSION['usuario'])) {
                     }
                     if (isset($_SESSION['usuario'])) {
                         unset($_SESSION['usuario']);
-                        session_destroy();
                         $result = array('erro' => false);
                     } else {
                         $result = array('erro' => true, 'msg_erro' => 'Não existe um usuário logado.');
