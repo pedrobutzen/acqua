@@ -101,6 +101,29 @@ if (isset($_SESSION['usuario'])) {
                     }
                     //print_r($result);exit;
                     break;
+                case 'listartipo':
+                    if (isset($_SESSION['usuarioentrada'])) {
+                        $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
+                        $qtd_geral = mysqli_query($conect, "SELECT nome, idtipo FROM tipo WHERE ISNULL(usuario) OR usuario='$usuario_entrada' ORDER BY nome");
+                    } else {
+                        $qtd_geral = mysqli_query($conect, "SELECT nome, idtipo FROM tipo WHERE ISNULL(usuario) OR usuario='$usuario_logado' ORDER BY nome");
+                    }
+                    $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral_idioma
+                    );
+                    array_push($result, $qtd_array);
+
+                    if (mysqli_num_rows($qtd_geral) > 0) {
+                        while ($row = mysqli_fetch_array($qtd_geral)) {
+                            $dados = array(
+                                'idtipo' => utf8_encode($row["idtipo"]),
+                                'nome' => utf8_encode($row["nome"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    }
+                    break;
                 case 'montar':
                     $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
@@ -583,7 +606,7 @@ if (isset($_SESSION['usuario'])) {
                         $row = mysqli_fetch_array($resultados_usuario);
                         $_SESSION['usuarioentrada']['usuario'] = $row['usuario'];
                         $_SESSION['usuarioentrada']['status'] = 0;
-                        $usuario_entrada = $row['usuario'];
+                        $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
                         $action_id = $row['usuario'];
                         $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
                         $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");

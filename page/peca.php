@@ -32,12 +32,7 @@ $menu_page_active = "peca";
                             </div>
                             <div class="form-group">
                                 <label>Tipo*</label>
-                                <select class="form-control" name="tipo">
-                                    <option value="">Selecione</option>
-                                    <option value="1">Camisa</option>
-                                    <option value="2">Camiseta</option>
-                                    <option value="outro">Outro</option>
-                                </select>
+                                <select class="form-control cs-tipo" name="tipo"></select>
                             </div>
                             <div class="form-group cs-outro-form">
                                 <label>Outro</label>

@@ -80,11 +80,14 @@ switch (locale[4]) {
                             listar('peca', 1, 10);
                             alert_open("success", "Peça editada com sucesso.");
                             limpar_form_cadastro();
+                            return true;
                         } else {
+                            return false;
                             alert_open("danger", retorno.msg_erro);
                         }
                     },
                     error: function () {
+                        return false;
                         alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
                     }
                 });
@@ -503,6 +506,7 @@ function deslogar() {
 
 // ------- GERAL -------
 function listar(action_pagina, pagina_paginacao, qtd_itens) {
+    log(action_id_local);
     limpar_form_cadastro();
     $.ajax({
         type: 'GET',
@@ -746,13 +750,32 @@ function pre_editar(pagina, id) {
                         $('select[name=usuario_permissao]').val(retorno[0].permissao);
                         break;
                     case 'peca':
-                        $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
-                        $('input[name=descricao]').val(retorno[0].descricaopeca);
-                        $('input[name=id-editar]').val(retorno[0].idpeca);
-                        $('input[name=marca]').val(retorno[0].marca);
-                        $('input[name=cor]').val(retorno[0].cor);
-                        $('input[name=tamanho]').val(retorno[0].tamanho);
-                        $('select[name=tipo]').val(retorno[0].idtipo);
+                        $.ajax({type: 'GET',
+                            url: 'action/action.php',
+                            dataType: 'json',
+                            data: {
+                                action_pagina: 'peca',
+                                action: "listartipo"
+                            },
+                            success: function (retornotipo) {
+                                if (retornotipo.erro === false) {
+                                    var html_select = '<option value="">Selecione</option>';
+                                    for (var i = 1; i < retornotipo[0].qtd_geral + 1; i++) {
+                                        html_select += '<option value="' + retornotipo[i].idtipo + '">' + retornotipo[i].nome + '</option>';
+                                    }
+                                    html_select += '<option value="outro">Outro</option>';
+                                    $('select[name=tipo]').html(html_select);
+
+                                    $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
+                                    $('input[name=descricao]').val(retorno[0].descricaopeca);
+                                    $('input[name=id-editar]').val(retorno[0].idpeca);
+                                    $('input[name=marca]').val(retorno[0].marca);
+                                    $('input[name=cor]').val(retorno[0].cor);
+                                    $('input[name=tamanho]').val(retorno[0].tamanho);
+                                    $('select[name=tipo]').val(retorno[0].idtipo);
+                                }
+                            }
+                        });
                         break;
                     default:
                         break;
@@ -1033,7 +1056,7 @@ function modal_open(id, pagina, titulo) {
                             break;
                     }
                 } else if (pagina === "entradapeca") {
-                    var btn_editar_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
+                    var btn_editar_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento-info">Editar</button>';
                     var btn_excluir_peca_lancamento = '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
 
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
@@ -1050,6 +1073,173 @@ function modal_open(id, pagina, titulo) {
                 $('.modal-body').html(html_body);
                 $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                 $('#cs-modal').modal('show');
+                $('button.cs-editar-peca-lancamento-info').click(function () {
+                    pre_editar('peca', $(this).attr('data-id'));
+                    $('span#cs-div-pesquisa').hide();
+                    $('span#cs-div-editar').show();
+                    $('button.cs-cancelar-editar-lancamento').click(function () {
+                        $('span#cs-div-pesquisa').show();
+                        $('span#cs-div-editar').hide();
+                    });
+                    $('button.cs-editar-lancamento').click(function () {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'action/action.php',
+                            dataType: 'json',
+                            data: {
+                                action_pagina: 'entradapeca',
+                                action: "pegarlogado"
+                            },
+                            success: function (retorno) {
+                                if (retorno.erro === false) {
+                                    if (retorno.status === 0) {
+                                        titulo = "Digite a senha para autorização - Aluno";
+                                        html_body = '<form class="form-horizontal" role="form"><div class="form-group"><label class="col-sm-2 control-label">RA</label><div class="col-sm-10"><p class="form-control-static">' + retorno.usuario + '</p></div></div><div class="form-group"><label for="inputPassword" class="col-sm-2 control-label">Senha</label><div class="col-sm-10"><input type="password" name="senha" class="form-control" id="inputPassword" placeholder="Senha"></div></div></form>';
+                                        html_footer = '<button type="button" class="btn btn-primary cs-autorizar">Autorizar</button>';
+                                    } else {
+                                        titulo = "Deseja realmente salvar as alterações?";
+                                        html_body = "As informações anteriores serão perdidas.";
+                                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
+                                    }
+                                    $('.modal-title').html(titulo);
+                                    $('.modal-body').html(html_body);
+                                    $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                    $('#cs-modal').modal('show');
+                                    $('#cs-modal .cs-editar-peca-lancamento').click(function () {
+                                        var idpeca = $('input[name=id-editar]').val();
+                                        var descricao = $('input[name=descricao]').val();
+                                        var marca = $('input[name=marca]').val();
+                                        var cor = $('input[name=cor]').val();
+                                        var tamanho = $('input[name=tamanho]').val();
+                                        var tipo = $('select[name=tipo]').find(":selected").val();
+                                        if (descricao === "" || marca === "" || cor === "" || tipo === "") {
+                                            alert_open("danger", "Os campos com * são obrigatórios.");
+                                        } else {
+                                            if (tipo === "outro") {
+                                                tipo = $('input[name=tipo_outro]').val();
+                                            }
+                                            $.ajax({
+                                                type: 'GET',
+                                                url: 'action/action.php',
+                                                dataType: 'json',
+                                                data: {
+                                                    action_pagina: "peca",
+                                                    action: "editar",
+                                                    action_id: idpeca,
+                                                    descricao: descricao,
+                                                    marca: marca,
+                                                    cor: cor,
+                                                    tamanho: tamanho,
+                                                    idtipo: tipo
+                                                },
+                                                success: function (retorno) {
+                                                    if (retorno.erro === false) {
+                                                        listar('entradapeca', 1, 10);
+                                                        alert_open("success", "Peça editada com sucesso.");
+                                                        $('span#cs-div-pesquisa').show();
+                                                        $('span#cs-div-editar').hide();
+                                                        return true;
+                                                    } else {
+                                                        return false;
+                                                        alert_open("danger", retorno.msg_erro);
+                                                    }
+                                                },
+                                                error: function () {
+                                                    return false;
+                                                    alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                                }
+                                            });
+                                        }
+                                        $('#cs-modal').modal('hide');
+                                    });
+                                    $('#cs-modal .cs-autorizar').click(function () {
+                                        if ($('input[name=senha]').val() === "") {
+                                            alert_open("danger", "O campo senha é obrigatório.");
+                                        } else {
+                                            $.ajax({
+                                                type: 'GET',
+                                                url: 'action/action.php',
+                                                dataType: 'json',
+                                                data: {
+                                                    action_pagina: 'entradapeca',
+                                                    action: "logarusuario",
+                                                    senha: $('input[name=senha]').val()
+                                                },
+                                                success: function (retorno) {
+                                                    if (retorno.erro === false) {
+                                                        alert_open("success", "Usuário autorizado a fazer alterações.");
+                                                        titulo = "Deseja realmente salvar as alterações?";
+                                                        html_body = "As informações anteriores serão perdidas.";
+                                                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
+                                                        log(id + '--' + pagina)
+                                                        $('.modal-title').html(titulo);
+                                                        $('.modal-body').html(html_body);
+                                                        $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
+                                                        $('#cs-modal .cs-editar-peca-lancamento').click(function () {
+                                                            var idpeca = $('input[name=id-editar]').val();
+                                                            var descricao = $('input[name=descricao]').val();
+                                                            var marca = $('input[name=marca]').val();
+                                                            var cor = $('input[name=cor]').val();
+                                                            var tamanho = $('input[name=tamanho]').val();
+                                                            var tipo = $('select[name=tipo]').find(":selected").val();
+                                                            if (descricao === "" || marca === "" || cor === "" || tipo === "") {
+                                                                alert_open("danger", "Os campos com * são obrigatórios.");
+                                                            } else {
+                                                                if (tipo === "outro") {
+                                                                    tipo = $('input[name=tipo_outro]').val();
+                                                                }
+                                                                $.ajax({
+                                                                    type: 'GET',
+                                                                    url: 'action/action.php',
+                                                                    dataType: 'json',
+                                                                    data: {
+                                                                        action_pagina: "peca",
+                                                                        action: "editar",
+                                                                        action_id: idpeca,
+                                                                        descricao: descricao,
+                                                                        marca: marca,
+                                                                        cor: cor,
+                                                                        tamanho: tamanho,
+                                                                        idtipo: tipo
+                                                                    },
+                                                                    success: function (retorno) {
+                                                                        if (retorno.erro === false) {
+                                                                            listar('entradapeca', 1, 10);
+                                                                            alert_open("success", "Peça editada com sucesso.");
+                                                                            $('span#cs-div-pesquisa').show();
+                                                                            $('span#cs-div-editar').hide();
+                                                                            return true;
+                                                                        } else {
+                                                                            return false;
+                                                                            alert_open("danger", retorno.msg_erro);
+                                                                        }
+                                                                    },
+                                                                    error: function () {
+                                                                        return false;
+                                                                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                                                    }
+                                                                });
+                                                            }
+                                                            $('#cs-modal').modal('hide');
+                                                        });
+                                                    } else {
+                                                        alert_open("danger", retorno.msg_erro);
+                                                    }
+                                                },
+                                                error: function () {
+                                                    alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    alert_open("danger", retorno.msg_erro);
+                                }
+                            }
+                        });
+                    });
+                    $('#cs-modal').modal('hide');
+                });
                 $('button.cs-receber-peca').click(function () {
                     listar('entradapeca', 1, 10);
                     $('#cs-modal').modal('hide');

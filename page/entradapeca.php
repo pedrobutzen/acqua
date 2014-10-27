@@ -12,7 +12,7 @@ $menu_page_active = "lancamento";
                         <div class="panel panel-default">
 
                             <div class="panel-heading text-center">
-                                <span id="cs-action">Pesquisar</span> Aluno
+                                Pesquisar Aluno
                             </div>
                             <div class="panel-body" id="cs-form">
                                 <input name="id_peca" type="text" class="cs-id-form">
@@ -33,10 +33,10 @@ $menu_page_active = "lancamento";
                     <span id="cs-div-editar">
                         <div class="panel panel-default">
                             <div class="panel-heading text-center">
-                                <span id="cs-action">Editar</span> Peça
+                                Editar Peça
                             </div>
                             <div class="panel-body" id="cs-form">
-                                <input name="id_peca" type="text" class="cs-id-form">
+                                <div class="cs-id-editar"></div>
                                 <div class="form-group">
                                     <label>Descrição*</label>
                                     <input name="descricao" type="text" class="form-control">
@@ -55,20 +55,15 @@ $menu_page_active = "lancamento";
                                 </div>
                                 <div class="form-group">
                                     <label>Tipo*</label>
-                                    <select class="form-control" name="tipo">
-                                        <option value="">Selecione</option>
-                                        <option value="1">Camisa</option>
-                                        <option value="2">Camiseta</option>
-                                        <option value="outro">Outro</option>
-                                    </select>
+                                    <select class="form-control cs-tipo" name="tipo"></select>
                                 </div>
                                 <div class="form-group cs-outro-form">
                                     <label>Outro</label>
                                     <input name="tipo_outro" type="text" class="form-control">
                                 </div>
-                                <button type="button" data-action="editar_peca" class="btn btn-primary cs-editar">Editar</button>
+                                <button type="button" class="btn btn-primary cs-editar-lancamento">Editar</button>
                                 <button type="button" data-action="limpar" class="btn btn-default cs-limpar">Limpar</button>
-                                <button type="button" data-pagina="peca" class="btn btn-default cs-cancelar">Cancelar</button>
+                                <button type="button" class="btn btn-default cs-cancelar-editar-lancamento">Cancelar</button>
                             </div>
                         </div>
                     </span>
