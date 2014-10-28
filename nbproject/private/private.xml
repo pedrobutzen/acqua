@@ -5,12 +5,15 @@
         <group>
             <file>file:/C:/wamp/www/acqua/page/peca.php</file>
             <file>file:/C:/wamp/www/acqua/index.php</file>
+            <file>file:/C:/wamp/www/acqua/view/php/titulo.php</file>
             <file>file:/C:/wamp/www/acqua/view/css/style.css</file>
+            <file>file:/C:/wamp/www/acqua/page/visualizarlancamento.php</file>
             <file>file:/C:/wamp/www/acqua/action/action.php</file>
             <file>file:/C:/wamp/www/acqua/view/js/action.js</file>
             <file>file:/C:/wamp/www/acqua/layout/layout.php</file>
             <file>file:/C:/wamp/www/acqua/page/usuario.php</file>
             <file>file:/C:/wamp/www/acqua/page/entradapeca.php</file>
+            <file>file:/C:/wamp/www/acqua/page/saidapeca.php</file>
         </group>
     </open-files>
 </project-private>
