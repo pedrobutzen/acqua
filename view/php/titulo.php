@@ -27,11 +27,35 @@ if ($is_page_erro) {
         case "peca":
             $pageTitulo = "Peça" . $sufixoTitulo;
             break;
-        case "livro":
-            $pageTitulo = "Livro" . $sufixoTitulo;
+        case "atribuirnumero":
+            $pageTitulo = "Atribuir Número" . $sufixoTitulo;
             break;
-        case "capitulo":
-            $pageTitulo = "Capítulo" . $sufixoTitulo;
+        case "entradapeca":
+            $pageTitulo = "Entrada Peça" . $sufixoTitulo;
+            break;
+        case "lancamento":
+            $pageTitulo = "Lançamento" . $sufixoTitulo;
+            break;
+        case "lancamentoativo":
+            $pageTitulo = "Lançamento Ativo" . $sufixoTitulo;
+            break;
+        case "lancamentospassados":
+            $pageTitulo = "Lanamentos Passados" . $sufixoTitulo;
+            break;
+        case "numero":
+            $pageTitulo = "Número" . $sufixoTitulo;
+            break;
+        case "ocorrencia":
+            $pageTitulo = "Ocorrência" . $sufixoTitulo;
+            break;
+        case "peca":
+            $pageTitulo = "Peça" . $sufixoTitulo;
+            break;
+        case "saidapeca":
+            $pageTitulo = "Saída Peça" . $sufixoTitulo;
+            break;
+        case "usuario":
+            $pageTitulo = "Usuário" . $sufixoTitulo;
             break;
         default:
             $pageTitulo = "Acqua - Sistema de Lavanderia";

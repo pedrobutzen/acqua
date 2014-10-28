@@ -506,7 +506,6 @@ function deslogar() {
 
 // ------- GERAL -------
 function listar(action_pagina, pagina_paginacao, qtd_itens) {
-    log(action_id_local);
     limpar_form_cadastro();
     $.ajax({
         type: 'GET',
@@ -565,11 +564,45 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                                     dataType: 'json',
                                     data: {
                                         action_pagina: 'entradapeca',
-                                        action: "confirmar"
+                                        action: "confirmarentrada"
                                     },
                                     success: function (retorno) {
                                         if (retorno.erro === false) {
                                             alert_open("success", "Entrada de lançamento confirmada com sucesso.");
+                                            $('#cs-dataGrid').html("");
+                                            $('#botao-rigth').html("");
+                                            $('#cs-modal').modal('hide');
+                                        } else {
+                                            alert_open("danger", retorno.msg_erro);
+                                        }
+                                    },
+                                    error: function () {
+                                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                                    }
+                                });
+                            });
+                        });
+                        break;
+                    case "saidapeca":
+                        $('div.cs-legenda').html('');
+                        $('span#botao-rigth').html('<button type="button" class="btn btn-primary cs-saidapecalancamento-info" >Confirmar Devolução</button>');
+                        for (var j = 1; j < a - 1; j++) {
+                            html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="saidapeca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td></tr>';
+                        }
+                        $('button.cs-saidapecalancamento-info').click(function () {
+                            modal_info('Deseja realmente confirmar a devolução das peças da lista?', 'Confira se todas as peças da lista estão sendo devolvidas e de acordo com a descrição.', '<button type="button" class="btn btn-primary cs-saidapecalancamento">Confirmar</button>');
+                            $('button.cs-saidapecalancamento').click(function () {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'action/action.php',
+                                    dataType: 'json',
+                                    data: {
+                                        action_pagina: 'saidapeca',
+                                        action: "confirmarsaida"
+                                    },
+                                    success: function (retorno) {
+                                        if (retorno.erro === false) {
+                                            alert_open("success", "Devolução confirmada com sucesso.");
                                             $('#cs-dataGrid').html("");
                                             $('#botao-rigth').html("");
                                             $('#cs-modal').modal('hide');
@@ -1007,58 +1040,57 @@ function modal_open(id, pagina, titulo) {
                     html_footer = "";
                 } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca") {
                     html_footer = "";
-                    var btn_receber_peca = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-receber-peca">Receber Peça</button>';
-
-                    var btn_alterar_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
-                    var btn_atribuir_num = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
-
-                    var btn_bloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
-                    var btn_desbloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
+                    html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                    html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
+                    html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                    html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
+                    if (retorno[0].num === "") {
+                        html_body += '<li class="gray"><strong>Número:</strong><span id="cs-num-aluno">Aluno sem número</span></li>';
+                    } else {
+                        html_body += '<li><strong>Número:</strong><span id="cs-num-aluno">' + retorno[0].num + '</span></li>';
+                    }
+                    html_body += '<li><strong>Ramal:</strong>' + retorno[0].ramal + '</li>';
+                    html_body += '<li><strong>Quarto:</strong>' + retorno[0].quarto + '</li>';
+                    if (retorno[0].bloqueado === "1") {
+                        html_body += '<li><strong>Status:</strong>Bloqueado</li>';
+                    } else {
+                        html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
+                    }
                     switch (pagina) {
                         case 'usuarioentradapeca':
-                            html_body = '<ul class="list-unstyled" id="cs-list-modal">';
-                            html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
-                            html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
-                            html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
-                            if (retorno[0].num === "") {
-                                html_body += '<li class="gray"><strong>Número:</strong><span id="cs-num-aluno">Aluno sem número</span></li>';
-                            } else {
-                                html_body += '<li><strong>Número:</strong><span id="cs-num-aluno">' + retorno[0].num + '</span></li>';
-                            }
-                            html_body += '<li><strong>Ramal:</strong>' + retorno[0].ramal + '</li>';
-                            html_body += '<li><strong>Quarto:</strong>' + retorno[0].quarto + '</li>';
-                            if (retorno[0].bloqueado === "1") {
-                                html_body += '<li><strong>Status:</strong>Bloqueado</li>';
-                            } else {
-                                html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
-                            }
                             if (retorno[0].lancamentoativo === 0) {
                                 html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
                             } else if (retorno[0].lancamentoativo === -1) {
                                 html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno já possui peças na lavanderia</li>';
                             } else {
-                                html_footer = btn_receber_peca;
+                                html_footer = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-receber-peca">Receber Peça</button>';
                             }
-                            html_body += '</ul>';
-                            if (retorno[0].num === "") {
-                                html_footer += btn_atribuir_num;
+                            break;
+                        case 'usuariosaidapeca':
+                            if (retorno[0].lancamentoativo === 0) {
+                                html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno não criou um lançamento</li>';
+                            } else if (retorno[0].lancamentoativo === -1) {
+                                html_body += '<br><li><strong>Status do Lançamento:</strong>Aluno criou lançamento, porém não troxe as peças para lavanderia</li>';
                             } else {
-                                html_footer += btn_alterar_num;
+                                html_footer = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-devolver-peca">Devolver Peça</button>';
                             }
-                            if (retorno[0].bloqueado === "" || retorno[0].bloqueado === "0") {
-                                html_footer += btn_bloquear;
-                            } else {
-                                html_footer += btn_desbloquear;
-                            }
-                            action_id_local = retorno[0].lancamentoativo;
                             break;
                         default:
                             break;
                     }
-                } else if (pagina === "entradapeca") {
-                    var btn_editar_peca_lancamento = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento-info">Editar</button>';
-                    var btn_excluir_peca_lancamento = '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
-
+                    html_body += '</ul>';
+                    if (retorno[0].num === "") {
+                        html_footer += '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
+                    } else {
+                        html_footer += '<button type="button" data-id="' + id + '" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
+                    }
+                    if (retorno[0].bloqueado === "" || retorno[0].bloqueado === "0") {
+                        html_footer += '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
+                    } else {
+                        html_footer += '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
+                    }
+                    action_id_local = retorno[0].lancamentoativo;
+                } else if (pagina === "entradapeca" || pagina === "saidapeca") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
                     html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
@@ -1066,13 +1098,65 @@ function modal_open(id, pagina, titulo) {
                     html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
                     html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
                     html_body += '</ul>';
-
-                    html_footer = btn_editar_peca_lancamento + btn_excluir_peca_lancamento;
+                    if (pagina === "entradapeca") {
+                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento-info">Editar</button>' + '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
+                    } else {
+                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
+                    }
                 }
                 $('.modal-title').html(titulo);
                 $('.modal-body').html(html_body);
                 $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                 $('#cs-modal').modal('show');
+                $('#cs-modal .cs-cadastrarocorrencia-lancamento-info').click(function () {
+                    modal_info("Cadastrar ocorrência ligada a peça selecionada", '<form class="form-horizontal" role="form"><div class="form-group"><label for="inputdescricao" class="col-sm-2 control-label">Descrição</label><div class="col-sm-10"><input type="text" name="descricao" class="form-control" id="inputdescricao" placeholder="Descrição"></div></div><div class="form-group"><label for="selectTipo" class="col-sm-2 control-label">Tipo</label><div class="col-sm-10"><select name="selectTipo" id="selectTipo" class="form-control"></select></div></div></form>', '<button type="button" data-id="' + id + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento">Cadastrar Ocorrência</button>');
+                    $.ajax({
+                        type: 'GET',
+                        url: 'action/action.php',
+                        dataType: 'json',
+                        data: {
+                            action_pagina: "ocorrencia",
+                            action: "listartipo"
+                        },
+                        success: function (retorno) {
+                            var html_select = '<option value="">Selecione</option>';
+                            if (retorno.erro === false) {
+                                for (var i = 1; i < retorno[0].qtd_geral + 1; i++) {
+                                    html_select += '<option value="' + retorno[i].idtipo_ocorrencia + '">' + retorno[i].tipo + '</option>';
+                                }
+                            }
+                            $('select[name=selectTipo]').html(html_select);
+                        }
+                    });
+                    $('#cs-modal .cs-cadastrarocorrencia-lancamento').click(function () {
+                        var descricao = $('input[name=descricao]').val();
+                        var idtipo_ocorrencia = $('select[name=selectTipo]').find(":selected").val();
+                        if (descricao === "" || idtipo_ocorrencia === "") {
+                            alert_open("danger", "Todos campos são obrigatórios.");
+                        } else {
+                            $.ajax({
+                                type: 'GET',
+                                url: 'action/action.php',
+                                dataType: 'json',
+                                data: {
+                                    action_pagina: "ocorrencia",
+                                    action: "cadastrar",
+                                    descricao: descricao,
+                                    idtipo_ocorrencia: idtipo_ocorrencia,
+                                    idpeca: id
+                                },
+                                success: function (retorno) {
+                                    if (retorno.erro === false) {
+                                        alert_open("success", "Ocorrência cadastrada com sucesso.");
+                                        $('#cs-modal').modal('hide');
+                                    } else {
+                                        alert_open("danger", retorno.msg_erro);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
                 $('button.cs-editar-peca-lancamento-info').click(function () {
                     pre_editar('peca', $(this).attr('data-id'));
                     $('span#cs-div-pesquisa').hide();
@@ -1242,6 +1326,10 @@ function modal_open(id, pagina, titulo) {
                 });
                 $('button.cs-receber-peca').click(function () {
                     listar('entradapeca', 1, 10);
+                    $('#cs-modal').modal('hide');
+                });
+                $('button.cs-devolver-peca').click(function () {
+                    listar('saidapeca', 1, 10);
                     $('#cs-modal').modal('hide');
                 });
                 $('#cs-modal .cs-bloquear').click(function () {

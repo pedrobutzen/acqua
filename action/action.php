@@ -208,6 +208,41 @@ if (isset($_SESSION['usuario'])) {
             break;
         case "ocorrencia":
             switch ($action) {
+                case 'cadastrar':
+                    $descricao = $_GET['descricao'];
+                    $idtipo_ocorrencia = $_GET['idtipo_ocorrencia'];
+                    $idpeca = $_GET['idpeca'];
+                    $sql_peca = mysqli_query($conect, "SELECT status FROM peca WHERE idpeca='$idpeca'");
+                    if (mysqli_num_rows($sql_peca) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Peça não encontrada.');
+                    } else {
+                        $sql_tipo = mysqli_query($conect, "SELECT tipo FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$idtipo_ocorrencia'");
+                        if (mysqli_num_rows($sql_tipo) == 0) {
+                            $result = array('erro' => true, 'msg_erro' => 'Tipo selecionado não encontrado.');
+                        } else {
+                            $sql_insert_lancamento = mysqli_query($conect, "INSERT INTO ocorrencia (descricao, status, idpeca, idtipo_ocorrencia) VALUES ('$descricao', '1', '$idpeca', '$idtipo_ocorrencia');");
+                            $id_lancamento = mysqli_insert_id($conect);
+                        }
+                    }
+                    break;
+                case 'listartipo':
+                    $qtd_geral = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia ORDER BY tipo");
+                    $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral_idioma
+                    );
+                    array_push($result, $qtd_array);
+
+                    if (mysqli_num_rows($qtd_geral) > 0) {
+                        while ($row = mysqli_fetch_array($qtd_geral)) {
+                            $dados = array(
+                                'idtipo_ocorrencia' => utf8_encode($row["idtipo_ocorrencia"]),
+                                'tipo' => utf8_encode($row["tipo"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    }
+                    break;
                 case 'listar':
                     $pag = utf8_decode($_GET['listar_pag']);
                     $maximo = utf8_decode($_GET['listar_qtd_itens']);
@@ -492,7 +527,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case "entradapeca":
+        case ($action_pagina == "entradapeca" || $action_pagina == "saidapeca"):
             switch ($action) {
                 case 'listar':
                     $pag = utf8_decode($_GET['listar_pag']);
@@ -505,7 +540,7 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
 
-                    $peca_sql = mysqli_query($conect, "SELECT peca.* FROM peca JOIN(lancamento_has_peca) ON(peca.idpeca=lancamento_has_peca.idpeca AND lancamento_has_peca.idlancamento='$action_id') ORDER BY peca.descricao LIMIT $inicio, $maximo");
+                    $peca_sql = mysqli_query($conect, "SELECT peca.* FROM peca JOIN(lancamento_has_peca, tipo) ON(peca.idpeca=lancamento_has_peca.idpeca AND peca.idtipo=tipo.idtipo) WHERE lancamento_has_peca.idlancamento='$action_id' ORDER BY tipo.nome LIMIT $inicio, $maximo");
 
                     if (mysqli_num_rows($peca_sql) > 0) {
                         while ($row = mysqli_fetch_array($peca_sql)) {
@@ -554,7 +589,7 @@ if (isset($_SESSION['usuario'])) {
                         $result = array('erro' => true, 'msg_erro' => 'Peça não encontrada.');
                     }
                     break;
-                case 'confirmar':
+                case 'confirmarentrada':
                     $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
                     $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND ISNULL(data_recebimento);");
 
@@ -562,6 +597,18 @@ if (isset($_SESSION['usuario'])) {
                         $row = mysqli_fetch_array($sql_select_lancamento);
                         $idlancamento = $row['idlancamento'];
                         mysqli_query($conect, "UPDATE lancamento SET data_recebimento=NOW(), usuario_recebimento='$usuario_logado' WHERE idlancamento='$idlancamento';");
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontrado.');
+                    }
+                    break;
+                case 'confirmarsaida':
+                    $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
+                    $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
+
+                    if (mysqli_num_rows($sql_select_lancamento) == 1) {
+                        $row = mysqli_fetch_array($sql_select_lancamento);
+                        $idlancamento = $row['idlancamento'];
+                        mysqli_query($conect, "UPDATE lancamento SET data_devolucao=NOW(), usuario_devolucao='$usuario_logado' WHERE idlancamento='$idlancamento';");
                     } else {
                         $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontrado.');
                     }
@@ -595,7 +642,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case "usuarioentradapeca":
+        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca"):
             switch ($action) {
                 case 'montar':
                     $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
@@ -610,14 +657,25 @@ if (isset($_SESSION['usuario'])) {
                         $action_id = $row['usuario'];
                         $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
                         $resultados2 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND ISNULL(data_recebimento);");
-                        $resultados3 = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$action_id' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
-                        if (mysqli_num_rows($resultados2) > 0) {
-                            $row2 = mysqli_fetch_array($resultados2);
-                            $haslancamento = utf8_encode($row2["lancamentoativo"]);
-                        } elseif (mysqli_num_rows($resultados3) > 0) {
-                            $haslancamento = -1;
+                        $resultados3 = mysqli_query($conect, "SELECT idlancamento as lancamentoativo FROM lancamento WHERE usuario='$action_id' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
+                        if ($action_pagina == "usuarioentradapeca") {
+                            if (mysqli_num_rows($resultados2) > 0) {
+                                $row2 = mysqli_fetch_array($resultados2);
+                                $haslancamento = utf8_encode($row2["lancamentoativo"]);
+                            } elseif (mysqli_num_rows($resultados3) > 0) {
+                                $haslancamento = -1;
+                            } else {
+                                $haslancamento = 0;
+                            }
                         } else {
-                            $haslancamento = 0;
+                            if (mysqli_num_rows($resultados3) > 0) {
+                                $row2 = mysqli_fetch_array($resultados3);
+                                $haslancamento = utf8_encode($row2["lancamentoativo"]);
+                            } elseif (mysqli_num_rows($resultados2) > 0) {
+                                $haslancamento = -1;
+                            } else {
+                                $haslancamento = 0;
+                            }
                         }
 
                         if (mysqli_num_rows($resultados1) != 0) {
