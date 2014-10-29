@@ -22,7 +22,7 @@ $menu_page_active = "lancamento";
                                     <label>Número</label>
                                     <input name="numero" type="text" class="form-control">
                                 </div>
-                                <button type="button" data-pagina="visualizarlancamento" class="btn btn-primary cs-pesquisar">Pesquisar</button>
+                                <button type="button" data-pagina="usuariovisualizarlancamento" class="btn btn-primary cs-pesquisar">Pesquisar</button>
                                 <button type="button" data-action="limpar" class="btn btn-default cs-limpar">Limpar</button>
                             </div>
 
@@ -35,6 +35,7 @@ $menu_page_active = "lancamento";
                             <thead>
                                 <tr>
                                     <th>Data Criação</th>
+                                    <th>Usuário Aluno</th>
                                     <th>Data Recebimento</th>
                                     <th>Usuário que Recebeu</th>
                                     <th>Data Devolução</th>

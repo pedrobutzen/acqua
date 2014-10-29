@@ -3,6 +3,7 @@ var locale = String(window.location.href);
 locale = locale.split("/");
 var pagina_url = locale[4];
 var action_id_local = "";
+var tr_clicada = "";
 switch (locale[4]) {
     case 'peca':
         listar('peca', 1, 10);
@@ -100,6 +101,7 @@ switch (locale[4]) {
     case 'lancamento':
         $(document).ready(function () {
             $("#pecas-lancamento").multiSelect({
+                selectableOptgroup: true,
                 selectableHeader: "<div>Peças disponíveis para lavagem</div>",
                 selectionHeader: "<div>Peças para Lavar - (<span id=\'qtd-pecas\'>15</span> peças restantes)</div>",
                 selectableFooter: "<div>Clique na descrição da peça para marcar</div>",
@@ -175,10 +177,14 @@ switch (locale[4]) {
         }
         break;
     case 'lancamentoativo':
-        listar('lancamentoativo', 1, 10);
+        listar('lancamentoativo', 1, 15);
         break;
     case 'lancamentospassados':
-        listar('lancamentospassados', 1, 10);
+        listar('lancamentospassados', 1, 15);
+        break;
+    case 'visualizarlancamento':
+        action_id_local = "";
+        listar('visualizarlancamentousuario', 1, 15);
         break;
     case 'usuario':
         listar('usuario-funcionario', 1, 10);
@@ -627,6 +633,11 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="lancamentospassados" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
                         }
                         break;
+                    case "visualizarlancamentousuario":
+                        for (var j = 1; j < a - 1; j++) {
+                            html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
+                        }
+                        break;
                     case "usuario-funcionario":
                         $('#cs-thead-dataGrid').html('<tr><th>Nome</th><th>Usuário</th><th>Telefone/Contato</th></tr>');
                         for (var j = 1; j < a - 1; j++) {
@@ -714,12 +725,20 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'entradapeca':
+                            tr_clicada = $(this);
+                            titulo_modal = 'Detalhes de Peça';
+                            break;
+                        case 'saidapeca':
+                            tr_clicada = $(this);
                             titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'ocorrencia':
                             titulo_modal = 'Detalhes de Peça com Ocorrência';
                             break;
                         case 'lancamentospassados':
+                            titulo_modal = 'Detalhes do Lançamento';
+                            break;
+                        case 'visualizarlancamentousuario':
                             titulo_modal = 'Detalhes do Lançamento';
                             break;
                         case 'usuario-aluno':
@@ -833,7 +852,11 @@ function excluir(pagina, id) {
             action_id: id
         },
         success: function (retorno) {
-            listar(pagina, 1, 10);
+            if (pagina === "entradapeca") {
+                listar(pagina, 1, 15);
+            } else {
+                listar(pagina, 1, 10);
+            }
             if (retorno.erro === "success") {
                 alert_open("success", retorno.msg_status);
             } else if (retorno.erro === false) {
@@ -1022,9 +1045,10 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = "";
-                } else if (pagina === "lancamentospassados") {
+                } else if (pagina === "lancamentospassados" || pagina === "visualizarlancamentousuario") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Data Criação:</strong>' + retorno[0].data_criacao + '</li>';
+                    html_body += '<li><strong>Usuário Aluno:</strong>' + retorno[0].usuario + '</li>';
                     html_body += '<li><strong>Data Recebimento:</strong>' + retorno[0].data_recebimento + '</li>';
                     html_body += '<li><strong>Usuário que Recebeu:</strong>' + retorno[0].usuario_recebimento + '</li>';
                     html_body += '<li><strong>Data Devolução:</strong>' + retorno[0].data_devolucao + '</li>';
@@ -1038,7 +1062,7 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = "";
-                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca") {
+                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca" || pagina === "usuariovisualizarlancamento") {
                     html_footer = "";
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
@@ -1065,6 +1089,7 @@ function modal_open(id, pagina, titulo) {
                             } else {
                                 html_footer = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-receber-peca">Receber Peça</button>';
                             }
+                            action_id_local = retorno[0].lancamentoativo;
                             break;
                         case 'usuariosaidapeca':
                             if (retorno[0].lancamentoativo === 0) {
@@ -1074,6 +1099,11 @@ function modal_open(id, pagina, titulo) {
                             } else {
                                 html_footer = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-devolver-peca">Devolver Peça</button>';
                             }
+                            action_id_local = retorno[0].lancamentoativo;
+                            break;
+                        case 'usuariovisualizarlancamento':
+                            html_footer += '<button type="button" class="btn btn-primary cs-conf-usuario-lancamento">Confirmar Usuário</button>';
+                            action_id_local = retorno[0].usuario;
                             break;
                         default:
                             break;
@@ -1089,7 +1119,7 @@ function modal_open(id, pagina, titulo) {
                     } else {
                         html_footer += '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
                     }
-                    action_id_local = retorno[0].lancamentoativo;
+
                 } else if (pagina === "entradapeca" || pagina === "saidapeca") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
@@ -1098,16 +1128,29 @@ function modal_open(id, pagina, titulo) {
                     html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
                     html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
                     html_body += '</ul>';
-                    if (pagina === "entradapeca") {
-                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento-info">Editar</button>' + '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
+                    if ($(tr_clicada).hasClass('cs-tr-blue')) {
+                        html_footer = '<button type="button" class="btn btn-primary cs-desconferir-peca">Desconferir</button>';
                     } else {
-                        html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
+                        html_footer = '<button type="button" class="btn btn-primary cs-conferir-peca">Conferir</button>';
+                    }
+                    if (pagina === "entradapeca") {
+                        html_footer += '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento-info">Editar</button>' + '<button type="button" data-id-lancamento="' + action_id_local + '" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir-info">Excluir do Lançamento</button>';
+                    } else {
+                        html_footer += '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
                     }
                 }
                 $('.modal-title').html(titulo);
                 $('.modal-body').html(html_body);
                 $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                 $('#cs-modal').modal('show');
+                $('#cs-modal .cs-conferir-peca').click(function () {
+                    $(tr_clicada).addClass('cs-tr-blue');
+                    $('#cs-modal').modal('hide');
+                });
+                $('#cs-modal .cs-desconferir-peca').click(function () {
+                    $(tr_clicada).removeClass('cs-tr-blue');
+                    $('#cs-modal').modal('hide');
+                });
                 $('#cs-modal .cs-cadastrarocorrencia-lancamento-info').click(function () {
                     modal_info("Cadastrar ocorrência ligada a peça selecionada", '<form class="form-horizontal" role="form"><div class="form-group"><label for="inputdescricao" class="col-sm-2 control-label">Descrição</label><div class="col-sm-10"><input type="text" name="descricao" class="form-control" id="inputdescricao" placeholder="Descrição"></div></div><div class="form-group"><label for="selectTipo" class="col-sm-2 control-label">Tipo</label><div class="col-sm-10"><select name="selectTipo" id="selectTipo" class="form-control"></select></div></div></form>', '<button type="button" data-id="' + id + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento">Cadastrar Ocorrência</button>');
                     $.ajax({
@@ -1218,7 +1261,7 @@ function modal_open(id, pagina, titulo) {
                                                 },
                                                 success: function (retorno) {
                                                     if (retorno.erro === false) {
-                                                        listar('entradapeca', 1, 10);
+                                                        listar('entradapeca', 1, 15);
                                                         alert_open("success", "Peça editada com sucesso.");
                                                         $('span#cs-div-pesquisa').show();
                                                         $('span#cs-div-editar').hide();
@@ -1288,7 +1331,7 @@ function modal_open(id, pagina, titulo) {
                                                                     },
                                                                     success: function (retorno) {
                                                                         if (retorno.erro === false) {
-                                                                            listar('entradapeca', 1, 10);
+                                                                            listar('entradapeca', 1, 15);
                                                                             alert_open("success", "Peça editada com sucesso.");
                                                                             $('span#cs-div-pesquisa').show();
                                                                             $('span#cs-div-editar').hide();
@@ -1325,11 +1368,15 @@ function modal_open(id, pagina, titulo) {
                     $('#cs-modal').modal('hide');
                 });
                 $('button.cs-receber-peca').click(function () {
-                    listar('entradapeca', 1, 10);
+                    listar('entradapeca', 1, 15);
                     $('#cs-modal').modal('hide');
                 });
                 $('button.cs-devolver-peca').click(function () {
-                    listar('saidapeca', 1, 10);
+                    listar('saidapeca', 1, 15);
+                    $('#cs-modal').modal('hide');
+                });
+                $('button.cs-conf-usuario-lancamento').click(function () {
+                    listar('visualizarlancamentousuario', 1, 10);
                     $('#cs-modal').modal('hide');
                 });
                 $('#cs-modal .cs-bloquear').click(function () {

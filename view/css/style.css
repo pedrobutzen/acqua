@@ -1,6 +1,10 @@
 .cs-bg-blue{
     background-color: #0c70a4 !important;
 }
+.cs-tr-blue{
+    background-color: #0c70a4;
+    color: #ffffff;
+}
 .navbar-top-links li {
     display: inline-block;
 }

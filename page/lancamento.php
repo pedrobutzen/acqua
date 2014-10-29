@@ -16,12 +16,16 @@ $menu_page_active = "lancamento";
                         ?>
                         <select id='pecas-lancamento' multiple='multiple' >
                             <?php
-                            $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, peca.idtipo FROM peca LEFT JOIN(ocorrencia) ON(peca.idpeca = ocorrencia.idpeca) WHERE peca.usuario='$usuario_logado' AND (ISNULL(ocorrencia.idocorrencia) OR ocorrencia.status='0') AND peca.status='1' GROUP BY peca.idpeca ORDER BY peca.descricao");
-                            while ($row = mysqli_fetch_array($qtd_geral)) {
-                                $idtipo = $row['idtipo'];
-                                $sqltipo = mysqli_query($conect, "SELECT nome FROM tipo WHERE idtipo='$idtipo';");
-                                $row1 = mysqli_fetch_array($sqltipo);
-                                echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique'>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row1["nome"]) . "</option>";
+                            $qtd_tipo = mysqli_query($conect, "SELECT tipo.nome, tipo.idtipo FROM peca LEFT JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND peca.status='1' GROUP BY tipo.idtipo ORDER BY tipo.nome, peca.descricao");
+                            while ($row_tipo = mysqli_fetch_array($qtd_tipo)) {
+                                $nome_tipo = $row_tipo['nome'];
+                                $id_tipo = $row_tipo['idtipo'];
+                                echo "<optgroup label='" . utf8_encode($nome_tipo) . "'>";
+                                $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome FROM peca LEFT JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND peca.status='1' AND tipo.idtipo='$id_tipo' GROUP BY peca.idpeca ORDER BY peca.descricao");
+                                while ($row = mysqli_fetch_array($qtd_geral)) {
+                                    echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique'>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row["nome"]) . "</option>";
+                                }
+                                echo '</optgroup>';
                             }
                             ?>
                         </select>
@@ -38,19 +42,23 @@ $menu_page_active = "lancamento";
                     ?>
                     <select id='pecas-lancamento' multiple='multiple' >
                         <?php
-                        $qtd_geral_selecionados = mysqli_query($conect, "SELECT p.idpeca, p.descricao, p.marca, p.cor, p.tamanho, t.nome FROM peca as p JOIN(lancamento_has_peca as lp, lancamento as l, tipo as t) ON(p.idpeca=lp.idpeca AND l.idlancamento=lp.idlancamento AND p.idtipo=t.idtipo) WHERE p.usuario='$usuario_logado' AND ISNULL(l.data_recebimento) ORDER BY t.nome, p.descricao");
-                        while ($row = mysqli_fetch_array($qtd_geral_selecionados)) {
-                            $ids_selecionados[] = $row["idpeca"];
-                            echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique' selected>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row["nome"]) . "</option>";
-                        }
-                        $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, peca.idtipo FROM peca LEFT JOIN(ocorrencia) ON(peca.idpeca = ocorrencia.idpeca) WHERE peca.usuario='$usuario_logado' AND (ISNULL(ocorrencia.idocorrencia) OR ocorrencia.status='0') AND peca.status='1' GROUP BY peca.idpeca ORDER BY peca.descricao");
-                        while ($row = mysqli_fetch_array($qtd_geral)) {
-                            if (!in_array($row['idpeca'], $ids_selecionados)) {
-                                $idtipo = $row['idtipo'];
-                                $sqltipo = mysqli_query($conect, "SELECT nome FROM tipo WHERE idtipo='$idtipo';");
-                                $row1 = mysqli_fetch_array($sqltipo);
-                                echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique'>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row1["nome"]) . "</option>";
+                        $qtd_tipo = mysqli_query($conect, "SELECT tipo.nome, tipo.idtipo FROM peca LEFT JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND peca.status='1' GROUP BY tipo.idtipo ORDER BY tipo.nome, peca.descricao");
+                        while ($row_tipo = mysqli_fetch_array($qtd_tipo)) {
+                            $nome_tipo = $row_tipo['nome'];
+                            $id_tipo = $row_tipo['idtipo'];
+                            echo "<optgroup label='" . utf8_encode($nome_tipo) . "'>";
+                            $qtd_geral_selecionados = mysqli_query($conect, "SELECT p.idpeca, p.descricao, p.marca, p.cor, p.tamanho, t.nome FROM peca as p JOIN(lancamento_has_peca as lp, lancamento as l, tipo as t) ON(p.idpeca=lp.idpeca AND l.idlancamento=lp.idlancamento AND p.idtipo=t.idtipo) WHERE p.usuario='$usuario_logado' AND ISNULL(l.data_recebimento) AND t.idtipo='$id_tipo' ORDER BY t.nome, p.descricao");
+                            while ($row = mysqli_fetch_array($qtd_geral_selecionados)) {
+                                $ids_selecionados[] = $row["idpeca"];
+                                echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique' selected>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row["nome"]) . "</option>";
                             }
+                            $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome FROM peca LEFT JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND peca.status='1' AND tipo.idtipo='$id_tipo' GROUP BY peca.idpeca ORDER BY tipo.nome, peca.descricao");
+                            while ($row = mysqli_fetch_array($qtd_geral)) {
+                                if (!in_array($row['idpeca'], $ids_selecionados)) {
+                                    echo "<option value='" . utf8_encode($row["idpeca"]) . "' title='Clique'>" . utf8_encode($row["descricao"]) . ", " . utf8_encode($row["marca"]) . ", " . utf8_encode($row["cor"]) . ", " . utf8_encode($row["tamanho"]) . ", " . utf8_encode($row["nome"]) . "</option>";
+                                }
+                            }
+                            echo '</optgroup>';
                         }
                         ?>
                     </select>

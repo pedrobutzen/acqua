@@ -444,6 +444,96 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
+        case "visualizarlancamentousuario":
+            switch ($action) {
+                case 'listar':
+                    $pag = utf8_decode($_GET['listar_pag']);
+                    $maximo = utf8_decode($_GET['listar_qtd_itens']);
+                    $inicio = ($pag * $maximo) - $maximo;
+                    if ($action_id != "") {
+                        $sql_qtd_geral = mysqli_query($conect, "SELECT * FROM lancamento WHERE usuario='$action_id';");
+                    } else {
+                        $sql_qtd_geral = mysqli_query($conect, "SELECT * FROM lancamento;");
+                    }
+                    $qtd_geral = mysqli_num_rows($sql_qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral
+                    );
+                    array_push($result, $qtd_array);
+
+                    if ($action_id != "") {
+                        $resultados = mysqli_query($conect, "SELECT * FROM lancamento WHERE usuario='$action_id' ORDER BY data_criacao DESC LIMIT $inicio, $maximo");
+                    } else {
+                        $resultados = mysqli_query($conect, "SELECT * FROM lancamento ORDER BY data_criacao DESC LIMIT $inicio, $maximo");
+                    }
+
+                    if (mysqli_num_rows($resultados) > 0) {
+                        while ($row = mysqli_fetch_array($resultados)) {
+                            $data_criacao = date_format(date_create($row['data_criacao']), 'd/m/Y H:i:s');
+                            $data_recebimento = date_format(date_create($row['data_recebimento']), 'd/m/Y H:i:s');
+                            $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
+                            $dados = array(
+                                'idlancamento' => utf8_encode($row["idlancamento"]),
+                                'data_criacao' => $data_criacao,
+                                'data_recebimento' => $data_recebimento,
+                                'data_devolucao' => $data_devolucao,
+                                'usuario' => utf8_encode($row["usuario"]),
+                                'usuario_recebimento' => utf8_encode($row["usuario_recebimento"]),
+                                'usuario_devolucao' => utf8_encode($row["usuario_devolucao"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum lançamento encontrado.');
+                    }
+                    break;
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT * FROM lancamento WHERE idlancamento='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum lançamento encontrado.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados);
+                        $resultados1 = mysqli_query($conect, "SELECT * FROM lancamento_has_peca WHERE idlancamento='$action_id'");
+                        if (mysqli_num_rows($resultados1) != 0) {
+                            $pecas[] = array('qtd_pecas' => mysqli_num_rows($resultados1));
+                            while ($row1 = mysqli_fetch_array($resultados1)) {
+                                $id_peca = $row1['idpeca'];
+                                $resultados2 = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$id_peca'");
+                                if (mysqli_num_rows($resultados2) != 0) {
+                                    while ($row2 = mysqli_fetch_array($resultados2)) {
+                                        $dados2 = array(
+                                            'idpeca' => utf8_encode($row2["idpeca"]),
+                                            'descricao' => utf8_encode($row2["descricao"]),
+                                            'marca' => utf8_encode($row2["marca"]),
+                                            'cor' => utf8_encode($row2["cor"]),
+                                            'tamanho' => utf8_encode($row2["tamanho"]),
+                                            'nometipo' => utf8_encode($row2["nometipo"]),
+                                        );
+                                        array_push($pecas, $dados2);
+                                    }
+                                }
+                            }
+                        }
+                        $data_criacao = date_format(date_create($row['data_criacao']), 'd/m/Y H:i:s');
+                        $data_recebimento = date_format(date_create($row['data_recebimento']), 'd/m/Y H:i:s');
+                        $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
+                        $dados = array(
+                            'idlancamento' => utf8_encode($row["idlancamento"]),
+                            'data_criacao' => $data_criacao,
+                            'data_recebimento' => $data_recebimento,
+                            'data_devolucao' => $data_devolucao,
+                            'usuario' => utf8_encode($row["usuario"]),
+                            'usuario_recebimento' => utf8_encode($row["usuario_recebimento"]),
+                            'usuario_devolucao' => utf8_encode($row["usuario_devolucao"]),
+                            'pecas' => $pecas,
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            break;
         case "lancamentospassados":
             switch ($action) {
                 case 'listar':
@@ -460,11 +550,14 @@ if (isset($_SESSION['usuario'])) {
                     $resultados = mysqli_query($conect, "SELECT * FROM lancamento WHERE usuario='$usuario_logado' AND !ISNULL(data_recebimento) AND !ISNULL(data_devolucao) ORDER BY data_criacao DESC LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) > 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
+                            $data_criacao = date_format(date_create($row['data_criacao']), 'd/m/Y H:i:s');
+                            $data_recebimento = date_format(date_create($row['data_recebimento']), 'd/m/Y H:i:s');
+                            $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
                             $dados = array(
                                 'idlancamento' => utf8_encode($row["idlancamento"]),
-                                'data_criacao' => utf8_encode($row["data_criacao"]),
-                                'data_recebimento' => utf8_encode($row["data_recebimento"]),
-                                'data_devolucao' => utf8_encode($row["data_devolucao"]),
+                                'data_criacao' => $data_criacao,
+                                'data_recebimento' => $data_recebimento,
+                                'data_devolucao' => $data_devolucao,
                                 'usuario_recebimento' => utf8_encode($row["usuario_recebimento"]),
                                 'usuario_devolucao' => utf8_encode($row["usuario_devolucao"]),
                             );
@@ -501,11 +594,14 @@ if (isset($_SESSION['usuario'])) {
                                 }
                             }
                         }
+                        $data_criacao = date_format(date_create($row['data_criacao']), 'd/m/Y H:i:s');
+                        $data_recebimento = date_format(date_create($row['data_recebimento']), 'd/m/Y H:i:s');
+                        $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
                         $dados = array(
                             'idlancamento' => utf8_encode($row["idlancamento"]),
-                            'data_criacao' => utf8_encode($row["data_criacao"]),
-                            'data_recebimento' => utf8_encode($row["data_recebimento"]),
-                            'data_devolucao' => utf8_encode($row["data_devolucao"]),
+                            'data_criacao' => $data_criacao,
+                            'data_recebimento' => $data_recebimento,
+                            'data_devolucao' => $data_devolucao,
                             'usuario_recebimento' => utf8_encode($row["usuario_recebimento"]),
                             'usuario_devolucao' => utf8_encode($row["usuario_devolucao"]),
                             'pecas' => $pecas,
@@ -642,7 +738,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca"):
+        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariovisualizarlancamento"):
             switch ($action) {
                 case 'montar':
                     $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
