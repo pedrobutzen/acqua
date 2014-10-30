@@ -93,6 +93,7 @@ include_once 'conexao/conexao.php';
                                         <li><a href="<?php echo $caminho ?>visualizarpeca">Visualizar Peça</a></li>
                                         <li class="divider"></li>
                                         <li><a href="<?php echo $caminho ?>gerenciarocorrencia">Gerenciar Ocorrência</a></li>
+                                        <li><a href="<?php echo $caminho ?>tipoocorrencia">Cadastrar Tipo de Ocorrência</a></li>
                                     </ul>
                                 </li>
                                 <li id="lancamento" class="dropdown">
@@ -111,7 +112,6 @@ include_once 'conexao/conexao.php';
                                         <li><a href="<?php echo $caminho ?>usuario">Gerenciar Usuário</a></li>
                                         <li class="divider"></li>
                                         <li><a href="<?php echo $caminho ?>numero">Gerenciar Número</a></li>
-                                        <li class="divider"></li>
                                         <li><a href="<?php echo $caminho ?>atribuirnumero">Atribuir Número Automaticamente</a></li> 
                                     </ul>
                                 </li>

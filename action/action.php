@@ -47,61 +47,61 @@ if (isset($_SESSION['usuario'])) {
                     $pag = utf8_decode($_GET['listar_pag']);
                     $maximo = utf8_decode($_GET['listar_qtd_itens']);
                     $inicio = ($pag * $maximo) - $maximo;
-                    $qtd_geral = mysqli_query($conect, "SELECT idpeca FROM peca WHERE usuario='$usuario_logado'");
+                    $qtd_geral = mysqli_query($conect, "SELECT idpeca FROM peca WHERE usuario='$usuario_logado' AND peca.status='1'");
                     $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
                     $qtd_array = array(
                         'qtd_geral' => $qtd_geral_idioma
                     );
                     array_push($result, $qtd_array);
-
-                    $dados = NULL;
-                    $ids[] = '0';
-
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND ocorrencia.status='1' AND peca.status='1' ORDER BY tipo_ocorrencia.tipo, tipo.nome, peca.descricao LIMIT $inicio, $maximo");
+                    $ids[] = "";
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.idtipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as hasocorrencia FROM peca LEFT JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND peca.status='1' AND (ocorrencia.status='1' OR ISNULL(ocorrencia.status)) ORDER BY ocorrencia.status DESC, tipo.nome, peca.descricao LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) > 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
+                            $id_peca = $row["idpeca"];
+                            $resultados2 = mysqli_query($conect, "SELECT t.nome FROM tipo as t JOIN(peca as p) ON(t.idtipo=p.idtipo) WHERE p.idpeca='$id_peca'");
+                            $row2 = mysqli_fetch_array($resultados2);
                             $dados = array(
                                 'idpeca' => utf8_encode($row["idpeca"]),
                                 'descricao' => utf8_encode($row["descricao"]),
                                 'marca' => utf8_encode($row["marca"]),
                                 'cor' => utf8_encode($row["cor"]),
                                 'tamanho' => utf8_encode($row["tamanho"]),
-                                'nometipo' => utf8_encode($row["nometipo"]),
-                                'idocorrencia' => utf8_encode($row["idocorrencia"]),
+                                'nometipo' => utf8_encode($row2["nome"]),
+                                'hasocorrencia' => utf8_encode($row["hasocorrencia"]),
                                 'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
                             );
                             array_push($result, $dados);
                             $ids[] = $row["idpeca"];
                         }
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     }
-                    $resultados1 = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, ocorrencia.idocorrencia, peca.idtipo FROM peca LEFT JOIN(ocorrencia) ON(peca.idpeca = ocorrencia.idpeca) WHERE peca.usuario='$usuario_logado' AND (ISNULL(ocorrencia.idocorrencia) OR ocorrencia.status='0') AND peca.status='1' GROUP BY peca.idpeca ORDER BY peca.descricao LIMIT $inicio, $maximo");
-
-                    if (mysqli_num_rows($resultados1) > 0) {
-                        while ($row = mysqli_fetch_array($resultados1)) {
-                            if (!in_array($row["idpeca"], $ids)) {
-                                $id_tipo = $row["idtipo"];
-                                $resultados2 = mysqli_query($conect, "SELECT nome FROM tipo WHERE idtipo='$id_tipo'");
-                                $row2 = mysqli_fetch_array($resultados2);
-                                $dados = array(
-                                    'idpeca' => utf8_encode($row["idpeca"]),
-                                    'descricao' => utf8_encode($row["descricao"]),
-                                    'marca' => utf8_encode($row["marca"]),
-                                    'cor' => utf8_encode($row["cor"]),
-                                    'tamanho' => utf8_encode($row["tamanho"]),
-                                    'nometipo' => utf8_encode($row2["nome"]),
-                                    'idocorrencia' => "",
-                                );
-                                array_push($result, $dados);
+                    if (mysqli_num_rows($resultados) < $maximo) {
+                        $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.idtipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as hasocorrencia FROM peca LEFT JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND peca.status='1' AND ocorrencia.status='0' ORDER BY ocorrencia.status DESC, tipo.nome, peca.descricao LIMIT $inicio, $maximo");
+                        if (mysqli_num_rows($resultados) > 0) {
+                            while ($row = mysqli_fetch_array($resultados)) {
+                                $id_peca = $row["idpeca"];
+                                if (!in_array($id_peca, $ids)) {
+                                    $resultados2 = mysqli_query($conect, "SELECT t.nome FROM tipo as t JOIN(peca as p) ON(t.idtipo=p.idtipo) WHERE p.idpeca='$id_peca'");
+                                    $row2 = mysqli_fetch_array($resultados2);
+                                    $dados = array(
+                                        'idpeca' => utf8_encode($row["idpeca"]),
+                                        'descricao' => utf8_encode($row["descricao"]),
+                                        'marca' => utf8_encode($row["marca"]),
+                                        'cor' => utf8_encode($row["cor"]),
+                                        'tamanho' => utf8_encode($row["tamanho"]),
+                                        'nometipo' => utf8_encode($row2["nome"]),
+                                        'hasocorrencia' => utf8_encode($row["hasocorrencia"]),
+                                        'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
+                                    );
+                                    array_push($result, $dados);
+                                    $ids[] = $row["idpeca"];
+                                }
                             }
                         }
-                    } else {
-                        if (is_null($dados)) {
-                            $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
-                        }
                     }
-                    //print_r($result);exit;
                     break;
-                case 'listartipo':
+                case 'listarselect':
                     if (isset($_SESSION['usuarioentrada'])) {
                         $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
                         $qtd_geral = mysqli_query($conect, "SELECT nome, idtipo FROM tipo WHERE ISNULL(usuario) OR usuario='$usuario_entrada' ORDER BY nome");
@@ -206,6 +206,115 @@ if (isset($_SESSION['usuario'])) {
             }
 
             break;
+        case "gerenciarocorrencia":
+            switch ($action) {
+                case 'listar':
+                    $pag = utf8_decode($_GET['listar_pag']);
+                    $maximo = utf8_decode($_GET['listar_qtd_itens']);
+                    $inicio = ($pag * $maximo) - $maximo;
+                    if ($action_id == "") {
+                        $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE ocorrencia.status='1'");
+                    } else {
+                        $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$action_id' GROUP BY peca.idpeca");
+                    }
+                    $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral_idioma
+                    );
+                    array_push($result, $qtd_array);
+
+                    $ids[] = "0";
+                    $vazio = true;
+                    if ($action_id == "") {
+                        $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE ocorrencia.status='1' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
+                    } else {
+                        $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$action_id' AND ocorrencia.status='1' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
+                    }
+                    if (mysqli_num_rows($resultados) > 0) {
+                        $vazio = false;
+                        while ($row = mysqli_fetch_array($resultados)) {
+                            $dados = array(
+                                'idpeca' => utf8_encode($row["idpeca"]),
+                                'descricao' => utf8_encode($row["descricao"]),
+                                'marca' => utf8_encode($row["marca"]),
+                                'cor' => utf8_encode($row["cor"]),
+                                'tamanho' => utf8_encode($row["tamanho"]),
+                                'nometipo' => utf8_encode($row["nometipo"]),
+                                'idocorrencia' => utf8_encode($row["idocorrencia"]),
+                                'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
+                                'ocorrenciadescricao' => utf8_encode($row["ocorrenciadescricao"]),
+                                'ocorrenciastatus' => utf8_encode($row["ocorrenciastatus"]),
+                            );
+                            array_push($result, $dados);
+                            $ids[] = $row["idpeca"];
+                        }
+                    }
+                    if (mysqli_num_rows($resultados) < $maximo && $action_id != "") {
+                        $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$action_id' AND ocorrencia.status='0' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
+                        if (mysqli_num_rows($resultados) > 0) {
+                            $vazio = false;
+                            while ($row = mysqli_fetch_array($resultados)) {
+                                if (!in_array($row["idpeca"], $ids)) {
+                                    $dados = array(
+                                        'idpeca' => utf8_encode($row["idpeca"]),
+                                        'descricao' => utf8_encode($row["descricao"]),
+                                        'marca' => utf8_encode($row["marca"]),
+                                        'cor' => utf8_encode($row["cor"]),
+                                        'tamanho' => utf8_encode($row["tamanho"]),
+                                        'nometipo' => utf8_encode($row["nometipo"]),
+                                        'idocorrencia' => utf8_encode($row["idocorrencia"]),
+                                        'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
+                                        'ocorrenciadescricao' => utf8_encode($row["ocorrenciadescricao"]),
+                                        'ocorrenciastatus' => utf8_encode($row["ocorrenciastatus"]),
+                                    );
+                                    array_push($result, $dados);
+                                    $ids[] = $row["idpeca"];
+                                }
+                            }
+                        }
+                    }
+                    if ($vazio) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça com ocorrência encontrada.');
+                    }
+                    break;
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados);
+                        $id_peca = $row["idpeca"];
+                        $resultados1 = mysqli_query($conect, "SELECT ocorrencia.*, tipo_ocorrencia.tipo FROM ocorrencia JOIN(tipo_ocorrencia) ON(ocorrencia.idtipo_ocorrencia=tipo_ocorrencia.idtipo_ocorrencia)  WHERE idpeca='$id_peca' ORDER BY status DESC");
+                        $ocorrencias = array('qtd_ocorrencias' => mysqli_num_rows($resultados1));
+                        if (mysqli_num_rows($resultados1) > 0) {
+                            while ($row2 = mysqli_fetch_array($resultados1)) {
+                                $ocorrencia = array(
+                                    'idocorrencia' => utf8_encode($row2['idocorrencia']),
+                                    'descricao' => utf8_encode($row2['descricao']),
+                                    'status' => utf8_encode($row2['status']),
+                                    'idpeca' => utf8_encode($row2['idpeca']),
+                                    'tipoocorrencia' => utf8_encode($row2['tipo']),
+                                );
+                                array_push($ocorrencias, $ocorrencia);
+                            }
+                        }
+                        $dados = array(
+                            'idpeca' => utf8_encode($row["idpeca"]),
+                            'descricaopeca' => utf8_encode($row["descricao"]),
+                            'marca' => utf8_encode($row["marca"]),
+                            'cor' => utf8_encode($row["cor"]),
+                            'tamanho' => utf8_encode($row["tamanho"]),
+                            'idtipo' => utf8_encode($row["idtipo"]),
+                            'nometipo' => utf8_encode($row["nometipo"]),
+                            'ocorrencia' => $ocorrencias,
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                default :
+                    break;
+            }
+            break;
         case "ocorrencia":
             switch ($action) {
                 case 'cadastrar':
@@ -225,7 +334,7 @@ if (isset($_SESSION['usuario'])) {
                         }
                     }
                     break;
-                case 'listartipo':
+                case 'listarselect':
                     $qtd_geral = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia ORDER BY tipo");
                     $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
                     $qtd_array = array(
@@ -254,11 +363,11 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
 
-                    $dados = NULL;
-                    $ids[] = '0';
-
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND ocorrencia.status='1' ORDER BY tipo_ocorrencia.tipo, tipo.nome, peca.descricao LIMIT $inicio, $maximo");
+                    $ids[] = "0";
+                    $vazio = true;
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND ocorrencia.status='1' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) > 0) {
+                        $vazio = false;
                         while ($row = mysqli_fetch_array($resultados)) {
                             $dados = array(
                                 'idpeca' => utf8_encode($row["idpeca"]),
@@ -276,32 +385,34 @@ if (isset($_SESSION['usuario'])) {
                             $ids[] = $row["idpeca"];
                         }
                     }
-                    $resultados1 = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND ocorrencia.status<>'1' GROUP BY peca.idpeca ORDER BY tipo_ocorrencia.tipo, tipo.nome, peca.descricao LIMIT $inicio, $maximo");
-
-                    if (mysqli_num_rows($resultados1) > 0) {
-                        while ($row = mysqli_fetch_array($resultados1)) {
-                            if (!in_array($row["idpeca"], $ids)) {
-                                $dados = array(
-                                    'idpeca' => utf8_encode($row["idpeca"]),
-                                    'descricao' => utf8_encode($row["descricao"]),
-                                    'marca' => utf8_encode($row["marca"]),
-                                    'cor' => utf8_encode($row["cor"]),
-                                    'tamanho' => utf8_encode($row["tamanho"]),
-                                    'nometipo' => utf8_encode($row["nometipo"]),
-                                    'idocorrencia' => utf8_encode($row["idocorrencia"]),
-                                    'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
-                                    'ocorrenciadescricao' => utf8_encode($row["ocorrenciadescricao"]),
-                                    'ocorrenciastatus' => utf8_encode($row["ocorrenciastatus"]),
-                                );
-                                array_push($result, $dados);
+                    if (mysqli_num_rows($resultados) < $maximo) {
+                        $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$usuario_logado' AND ocorrencia.status='0' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
+                        if (mysqli_num_rows($resultados) > 0) {
+                            $vazio = false;
+                            while ($row = mysqli_fetch_array($resultados)) {
+                                $id_peca = $row["idpeca"];
+                                if (!in_array($id_peca, $ids)) {
+                                    $dados = array(
+                                        'idpeca' => utf8_encode($row["idpeca"]),
+                                        'descricao' => utf8_encode($row["descricao"]),
+                                        'marca' => utf8_encode($row["marca"]),
+                                        'cor' => utf8_encode($row["cor"]),
+                                        'tamanho' => utf8_encode($row["tamanho"]),
+                                        'nometipo' => utf8_encode($row["nometipo"]),
+                                        'idocorrencia' => utf8_encode($row["idocorrencia"]),
+                                        'tipoocorrencia' => utf8_encode($row["tipoocorrencia"]),
+                                        'ocorrenciadescricao' => utf8_encode($row["ocorrenciadescricao"]),
+                                        'ocorrenciastatus' => utf8_encode($row["ocorrenciastatus"]),
+                                    );
+                                    array_push($result, $dados);
+                                    $ids[] = $row["idpeca"];
+                                }
                             }
                         }
-                    } else {
-                        if (is_null($dados)) {
-                            $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça com ocorrência encontrada.');
-                        }
                     }
-                    //print_r($result);exit;
+                    if ($vazio) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça com ocorrência encontrada.');
+                    }
                     break;
                 case 'montar':
                     $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND idpeca='$action_id'");
@@ -555,6 +666,7 @@ if (isset($_SESSION['usuario'])) {
                             $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
                             $dados = array(
                                 'idlancamento' => utf8_encode($row["idlancamento"]),
+                                'usuario' => utf8_encode($row["usuario"]),
                                 'data_criacao' => $data_criacao,
                                 'data_recebimento' => $data_recebimento,
                                 'data_devolucao' => $data_devolucao,
@@ -599,6 +711,7 @@ if (isset($_SESSION['usuario'])) {
                         $data_devolucao = date_format(date_create($row['data_devolucao']), 'd/m/Y H:i:s');
                         $dados = array(
                             'idlancamento' => utf8_encode($row["idlancamento"]),
+                            'usuario' => utf8_encode($row["usuario"]),
                             'data_criacao' => $data_criacao,
                             'data_recebimento' => $data_recebimento,
                             'data_devolucao' => $data_devolucao,
@@ -906,7 +1019,7 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
 
-                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION ALL (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim))  ORDER BY bloqueado DESC, num ASC LIMIT $inicio, $maximo");
+                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION ALL (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim))  ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) != 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
                             $dados = array(
@@ -970,7 +1083,7 @@ if (isset($_SESSION['usuario'])) {
                         if (mysqli_num_rows($sql) > 0) {
                             $result = array('erro' => true, 'msg_erro' => 'Usuário já possui bloqueio ativo.');
                         } else {
-                            mysqli_query($conect, "INSERT INTO bloqueio (data_inicio, usuario) VALUES (NOW(), '$action_id');");
+                            mysqli_query($conect, "INSERT INTO bloqueio (data_inicio, usuario, usuario_bloqueio) VALUES (NOW(), '$action_id', '$usuario_logado');");
                         }
                     }
                     break;

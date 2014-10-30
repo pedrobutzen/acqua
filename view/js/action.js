@@ -182,9 +182,13 @@ switch (locale[4]) {
     case 'lancamentospassados':
         listar('lancamentospassados', 1, 15);
         break;
+    case 'gerenciarocorrencia':
+        action_id_local = "";
+        listar('gerenciarocorrencia', 1, 10);
+        break;
     case 'visualizarlancamento':
         action_id_local = "";
-        listar('visualizarlancamentousuario', 1, 15);
+        listar('visualizarlancamentousuario', 1, 10);
         break;
     case 'usuario':
         listar('usuario-funcionario', 1, 10);
@@ -511,6 +515,38 @@ function deslogar() {
 }
 
 // ------- GERAL -------
+function carregar_select(action_pagina) {
+    $.ajax({
+        type: 'GET',
+        url: 'action/action.php',
+        dataType: 'json',
+        data: {
+            action_pagina: action_pagina,
+            action: "listarselect"
+        },
+        success: function (retorno) {
+            var html_select = '<option value="">Selecione</option>';
+            if (retorno.erro === false) {
+                switch (action_pagina) {
+                    case "peca":
+                        for (var i = 1; i < retorno[0].qtd_geral + 1; i++) {
+                            html_select += '<option value="' + retorno[i].idtipo + '">' + retorno[i].nome + '</option>';
+                        }
+                        html_select += '<option value="outro">Outro</option>';
+                        break;
+                    case "ocorrencia":
+                        for (var i = 1; i < retorno[0].qtd_geral + 1; i++) {
+                            html_select += '<option value="' + retorno[i].idtipo_ocorrencia + '">' + retorno[i].tipo + '</option>';
+                        }
+                        break;
+                    default :
+                        break;
+                }
+            }
+            $('select').html(html_select);
+        }
+    });
+}
 function listar(action_pagina, pagina_paginacao, qtd_itens) {
     limpar_form_cadastro();
     $.ajax({
@@ -534,9 +570,10 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                 });
                 switch (action_pagina) {
                     case "peca":
+                        carregar_select(action_pagina);
                         $('div.cs-legenda').html('');
                         for (var j = 1; j < a - 1; j++) {
-                            if (retorno[j].idocorrencia !== "") {
+                            if (retorno[j].hasocorrencia === "1") {
                                 $('div.cs-legenda').html('<span class="gray">*Peça com ocorrência ativa registrada</span>');
                                 html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="peca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             } else {
@@ -636,6 +673,17 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                     case "visualizarlancamentousuario":
                         for (var j = 1; j < a - 1; j++) {
                             html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
+                        }
+                        break;
+                    case "gerenciarocorrencia":
+                        $('div.cs-legenda').html('');
+                        for (var j = 1; j < a - 1; j++) {
+                            if (retorno[j].ocorrenciastatus === "1") {
+                                $('div.cs-legenda').html('<span class="gray">*Peça com ocorrência ativa registrada</span>');
+                                html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
+                            } else {
+                                html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
+                            }
                         }
                         break;
                     case "usuario-funcionario":
@@ -802,32 +850,14 @@ function pre_editar(pagina, id) {
                         $('select[name=usuario_permissao]').val(retorno[0].permissao);
                         break;
                     case 'peca':
-                        $.ajax({type: 'GET',
-                            url: 'action/action.php',
-                            dataType: 'json',
-                            data: {
-                                action_pagina: 'peca',
-                                action: "listartipo"
-                            },
-                            success: function (retornotipo) {
-                                if (retornotipo.erro === false) {
-                                    var html_select = '<option value="">Selecione</option>';
-                                    for (var i = 1; i < retornotipo[0].qtd_geral + 1; i++) {
-                                        html_select += '<option value="' + retornotipo[i].idtipo + '">' + retornotipo[i].nome + '</option>';
-                                    }
-                                    html_select += '<option value="outro">Outro</option>';
-                                    $('select[name=tipo]').html(html_select);
-
-                                    $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
-                                    $('input[name=descricao]').val(retorno[0].descricaopeca);
-                                    $('input[name=id-editar]').val(retorno[0].idpeca);
-                                    $('input[name=marca]').val(retorno[0].marca);
-                                    $('input[name=cor]').val(retorno[0].cor);
-                                    $('input[name=tamanho]').val(retorno[0].tamanho);
-                                    $('select[name=tipo]').val(retorno[0].idtipo);
-                                }
-                            }
-                        });
+                        carregar_select(pagina);
+                        $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
+                        $('input[name=descricao]').val(retorno[0].descricaopeca);
+                        $('input[name=id-editar]').val(retorno[0].idpeca);
+                        $('input[name=marca]').val(retorno[0].marca);
+                        $('input[name=cor]').val(retorno[0].cor);
+                        $('input[name=tamanho]').val(retorno[0].tamanho);
+                        $('select[name=tipo]').val(retorno[0].idtipo);
                         break;
                     default:
                         break;
@@ -1026,7 +1056,7 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = btn_editar + btn_excluir;
-                } else if (pagina === "ocorrencia") {
+                } else if (pagina === "ocorrencia" || pagina === "gerenciarocorrencia") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
                     html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
@@ -1034,13 +1064,26 @@ function modal_open(id, pagina, titulo) {
                     html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
                     html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
                     html_body += '</ul>';
+
                     if (retorno[0].ocorrencia.qtd_ocorrencias > 0) {
                         var status_ocorrencia = Array();
                         status_ocorrencia["0"] = "Finalizada";
                         status_ocorrencia["1"] = "Ativa";
-                        html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th></tr></thead><tbody>';
+                        if (pagina === "ocorrencia") {
+                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th></tr></thead><tbody>';
+                        } else {
+                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th><th>Opção</th></tr></thead><tbody>';
+                        }
                         for (var i = 0; i < retorno[0].ocorrencia.qtd_ocorrencias; i++) {
-                            html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrenca + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td></tr>';
+                            if (pagina === "ocorrencia") {
+                                html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrencia + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td></tr>';
+                            } else {
+                                var btn_finalizar = "";
+                                if (retorno[0].ocorrencia[i].status === "1") {
+                                    btn_finalizar = '<button type="button" data-id="' + retorno[0].ocorrencia[i].idocorrencia + '" class="btn btn-primary cs-finalizar-ocorrencia">Finalizar</button>';
+                                }
+                                html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrencia + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td><td>' + btn_finalizar + '</td></tr>';
+                            }
                         }
                         html_body += '</tbody></table></div>';
                     }
@@ -1153,24 +1196,7 @@ function modal_open(id, pagina, titulo) {
                 });
                 $('#cs-modal .cs-cadastrarocorrencia-lancamento-info').click(function () {
                     modal_info("Cadastrar ocorrência ligada a peça selecionada", '<form class="form-horizontal" role="form"><div class="form-group"><label for="inputdescricao" class="col-sm-2 control-label">Descrição</label><div class="col-sm-10"><input type="text" name="descricao" class="form-control" id="inputdescricao" placeholder="Descrição"></div></div><div class="form-group"><label for="selectTipo" class="col-sm-2 control-label">Tipo</label><div class="col-sm-10"><select name="selectTipo" id="selectTipo" class="form-control"></select></div></div></form>', '<button type="button" data-id="' + id + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento">Cadastrar Ocorrência</button>');
-                    $.ajax({
-                        type: 'GET',
-                        url: 'action/action.php',
-                        dataType: 'json',
-                        data: {
-                            action_pagina: "ocorrencia",
-                            action: "listartipo"
-                        },
-                        success: function (retorno) {
-                            var html_select = '<option value="">Selecione</option>';
-                            if (retorno.erro === false) {
-                                for (var i = 1; i < retorno[0].qtd_geral + 1; i++) {
-                                    html_select += '<option value="' + retorno[i].idtipo_ocorrencia + '">' + retorno[i].tipo + '</option>';
-                                }
-                            }
-                            $('select[name=selectTipo]').html(html_select);
-                        }
-                    });
+                    carregar_select("ocorrencia");
                     $('#cs-modal .cs-cadastrarocorrencia-lancamento').click(function () {
                         var descricao = $('input[name=descricao]').val();
                         var idtipo_ocorrencia = $('select[name=selectTipo]').find(":selected").val();

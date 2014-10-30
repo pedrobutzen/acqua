@@ -25,8 +25,8 @@ $menu_page_active = "usuario";
                                     <option value="m">Masculino</option>
                                 </select>
                             </div>
-                            <button type="button" data-action="cadastrar_numero" class="btn btn-success cs-salvar">Salvar</button>
-                            <button type="reset" data-action="limpar" class="btn btn-warning">Limpar</button>
+                            <button type="button" data-action="cadastrar_numero" class="btn btn-primary cs-salvar">Salvar</button>
+                            <button type="reset" data-action="limpar" class="btn btn-default">Limpar</button>
                         </div>
                     </div>
                 </form>

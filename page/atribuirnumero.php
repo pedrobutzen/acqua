@@ -21,8 +21,8 @@ $menu_page_active = "usuario";
                                     <option value="m">Masculino</option>
                                 </select>
                             </div>
-                            <button type="button" class="btn btn-success cs-atribuir-auto">Atribuir</button>
-                            <button type="reset" data-action="limpar" class="btn btn-warning">Limpar</button>
+                            <button type="button" class="btn btn-primary cs-atribuir-auto">Atribuir</button>
+                            <button type="reset" data-action="limpar" class="btn btn-default">Limpar</button>
                         </div>
                     </div>
                 </form>
