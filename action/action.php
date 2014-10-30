@@ -430,7 +430,7 @@ if (isset($_SESSION['usuario'])) {
                                     'descricao' => utf8_encode($row2['descricao']),
                                     'status' => utf8_encode($row2['status']),
                                     'idpeca' => utf8_encode($row2['idpeca']),
-                                    'tipoocorrenca' => utf8_encode($row2['tipo']),
+                                    'tipoocorrencia' => utf8_encode($row2['tipo']),
                                 );
                                 array_push($ocorrencias, $ocorrencia);
                             }
