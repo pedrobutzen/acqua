@@ -22,7 +22,7 @@ $menu_page_active = "peca";
                                     <label>Número</label>
                                     <input name="numero" type="text" class="form-control">
                                 </div>
-                                <button type="button" data-pagina="gerenciarocorrencia" class="btn btn-primary cs-pesquisar">Pesquisar</button>
+                                <button type="button" data-pagina="usuariogerenciarocorrencia" class="btn btn-primary cs-pesquisar">Pesquisar</button>
                                 <button type="button" data-action="limpar" class="btn btn-default cs-limpar">Limpar</button>
                             </div>
 

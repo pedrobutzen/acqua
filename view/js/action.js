@@ -564,7 +564,6 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
             var html_tags = "";
             if (retorno.erro === false) {
                 var a = 0;
-                html_tags = "";
                 $.each(retorno, function () {
                     a++;
                 });
@@ -578,6 +577,17 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                                 html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="peca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             } else {
                                 html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="peca" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td><td>Normal</td></tr>';
+                            }
+                        }
+                        break;
+                    case "gerenciarocorrencia":
+                        $('div.cs-legenda').html('');
+                        for (var j = 1; j < a - 1; j++) {
+                            if (retorno[j].ocorrenciastatus === "1") {
+                                $('div.cs-legenda').html('<span class="gray">*Peça com ocorrência ativa registrada</span>');
+                                html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="ocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
+                            } else {
+                                html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="ocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             }
                         }
                         break;
@@ -673,17 +683,6 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                     case "visualizarlancamentousuario":
                         for (var j = 1; j < a - 1; j++) {
                             html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
-                        }
-                        break;
-                    case "gerenciarocorrencia":
-                        $('div.cs-legenda').html('');
-                        for (var j = 1; j < a - 1; j++) {
-                            if (retorno[j].ocorrenciastatus === "1") {
-                                $('div.cs-legenda').html('<span class="gray">*Peça com ocorrência ativa registrada</span>');
-                                html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
-                            } else {
-                                html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
-                            }
                         }
                         break;
                     case "usuario-funcionario":
@@ -1105,7 +1104,7 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = "";
-                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca" || pagina === "usuariovisualizarlancamento") {
+                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca" || pagina === "usuariovisualizarlancamento" || pagina === "usuariogerenciarocorrencia") {
                     html_footer = "";
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
@@ -1146,6 +1145,10 @@ function modal_open(id, pagina, titulo) {
                             break;
                         case 'usuariovisualizarlancamento':
                             html_footer += '<button type="button" class="btn btn-primary cs-conf-usuario-lancamento">Confirmar Usuário</button>';
+                            action_id_local = retorno[0].usuario;
+                            break;
+                        case 'usuariogerenciarocorrencia':
+                            html_footer += '<button type="button" class="btn btn-primary cs-conf-usuario-ocorrencia">Confirmar Usuário</button>';
                             action_id_local = retorno[0].usuario;
                             break;
                         default:
@@ -1403,6 +1406,10 @@ function modal_open(id, pagina, titulo) {
                 });
                 $('button.cs-conf-usuario-lancamento').click(function () {
                     listar('visualizarlancamentousuario', 1, 10);
+                    $('#cs-modal').modal('hide');
+                });
+                $('button.cs-conf-usuario-ocorrencia').click(function () {
+                    listar('gerenciarocorrencia', 1, 10);
                     $('#cs-modal').modal('hide');
                 });
                 $('#cs-modal .cs-bloquear').click(function () {

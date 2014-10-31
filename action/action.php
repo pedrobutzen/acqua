@@ -206,6 +206,48 @@ if (isset($_SESSION['usuario'])) {
             }
 
             break;
+        case ($action_pagina == "usuariogerenciamentoocorrencia"):
+            switch ($action) {
+                case 'montar':
+                    $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
+                    if (mysqli_num_rows($resultados_usuario) == 0) {
+                        $resultados_usuario = NULL;
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados_usuario);
+                        $_SESSION['usuarioentrada']['usuario'] = $row['usuario'];
+                        $_SESSION['usuarioentrada']['status'] = 0;
+                        $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
+                        $action_id = $row['usuario'];
+                        $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND ISNULL(data_fim);");
+                        $resultados2 = mysqli_query($conect, "SELECT ocorrencia.idocorrencia FROM peca JOIN(ocorrencia) ON(peca.idpeca = ocorrencia.idpeca) WHERE peca.usuario='$action_id' GROUP BY peca.idpeca");
+                        if (mysqli_num_rows($resultados2) > 0) {
+                            $row2 = mysqli_fetch_array($resultados2);
+                            $hasocorrencia = utf8_encode($row2["idocorrencia"]);
+                        } else {
+                            $hasocorrencia = 0;
+                        }
+
+                        $row1 = mysqli_fetch_array($resultados1);
+                        $dados = array(
+                            'nome' => utf8_encode($row["nome"]),
+                            'usuario' => utf8_encode($row["usuario"]),
+                            'sexo' => utf8_encode($row["sexo"]),
+                            'ramal' => utf8_encode($row["ramal"]),
+                            'quarto' => utf8_encode($row["quarto"]),
+                            'num' => utf8_encode($row["num"]),
+                            'senha' => utf8_encode($row["senha"]),
+                            'permissao' => utf8_encode($row["permissao"]),
+                            'bloqueado' => utf8_encode($row1["bloqueado"]),
+                            'hasocorrencia' => $hasocorrencia,
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            break;
         case "gerenciarocorrencia":
             switch ($action) {
                 case 'listar':
@@ -249,7 +291,7 @@ if (isset($_SESSION['usuario'])) {
                             $ids[] = $row["idpeca"];
                         }
                     }
-                    if (mysqli_num_rows($resultados) < $maximo && $action_id != "") {
+                    if (mysqli_num_rows($resultados) < $maximo) {
                         $resultados = mysqli_query($conect, "SELECT peca.idpeca, ocorrencia.idocorrencia, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo_ocorrencia.tipo as tipoocorrencia, ocorrencia.status as ocorrenciastatus, ocorrencia.descricao as ocorrenciadescricao FROM peca JOIN(tipo, ocorrencia, tipo_ocorrencia) ON(peca.idtipo = tipo.idtipo AND peca.idpeca = ocorrencia.idpeca AND ocorrencia.idtipo_ocorrencia = tipo_ocorrencia.idtipo_ocorrencia) WHERE peca.usuario='$action_id' AND ocorrencia.status='0' ORDER BY tipo.nome, tipo_ocorrencia.tipo, peca.descricao LIMIT $inicio, $maximo");
                         if (mysqli_num_rows($resultados) > 0) {
                             $vazio = false;
@@ -851,7 +893,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariovisualizarlancamento"):
+        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariogerenciarocorrencia"):
             switch ($action) {
                 case 'montar':
                     $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
