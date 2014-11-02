@@ -30,6 +30,9 @@ if ($is_page_erro) {
         case "atribuirnumero":
             $pageTitulo = "Atribuir Número" . $sufixoTitulo;
             break;
+        case "gerenciarocorrencia":
+            $pageTitulo = "Peça com Ocorrência" . $sufixoTitulo;
+            break;
         case "entradapeca":
             $pageTitulo = "Entrada Peça" . $sufixoTitulo;
             break;

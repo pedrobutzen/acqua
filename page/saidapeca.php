@@ -10,7 +10,6 @@ $menu_page_active = "lancamento";
                 <div class="col-lg-3 cs-p-botton25">
                     <span id="cs-div-pesquisa">
                         <div class="panel panel-default">
-
                             <div class="panel-heading text-center">
                                 Pesquisar Aluno
                             </div>

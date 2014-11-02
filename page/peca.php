@@ -13,7 +13,7 @@ $menu_page_active = "peca";
                             <span id="cs-action">Cadastrar</span> Peça
                         </div>
                         <div class="panel-body" id="cs-form">
-                            <input name="id_peca" type="text" class="cs-id-form">
+                            <div class="cs-id-editar"></div>
                             <div class="form-group">
                                 <label>Descrição*</label>
                                 <input name="descricao" type="text" class="form-control">

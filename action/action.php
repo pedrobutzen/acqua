@@ -141,6 +141,8 @@ if (isset($_SESSION['usuario'])) {
                                     'status' => utf8_encode($row2['status']),
                                     'idpeca' => utf8_encode($row2['idpeca']),
                                     'tipoocorrenca' => utf8_encode($row2['tipo']),
+                                    'usuario_criacao' => utf8_encode($row2['usuario_criacao']),
+                                    'usuario_finalizou' => utf8_encode($row2['usuario_finalizou']),
                                 );
                                 array_push($ocorrencias, $ocorrencia);
                             }
@@ -336,6 +338,8 @@ if (isset($_SESSION['usuario'])) {
                                     'status' => utf8_encode($row2['status']),
                                     'idpeca' => utf8_encode($row2['idpeca']),
                                     'tipoocorrencia' => utf8_encode($row2['tipo']),
+                                    'usuario_criacao' => utf8_encode($row2['usuario_criacao']),
+                                    'usuario_finalizou' => utf8_encode($row2['usuario_finalizou']),
                                 );
                                 array_push($ocorrencias, $ocorrencia);
                             }
@@ -349,6 +353,84 @@ if (isset($_SESSION['usuario'])) {
                             'idtipo' => utf8_encode($row["idtipo"]),
                             'nometipo' => utf8_encode($row["nometipo"]),
                             'ocorrencia' => $ocorrencias,
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                case 'finalizar':
+                    $sql_ocorrencia = mysqli_query($conect, "SELECT status FROM ocorrencia WHERE idocorrencia='$action_id'");
+                    if (mysqli_num_rows($sql_ocorrencia) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Ocorrência não encontrada.');
+                    } else {
+                        $sql_update = mysqli_query($conect, "UPDATE ocorrencia SET status='0', usuario_finalizou='$usuario_logado' WHERE idocorrencia='$action_id';");
+                    }
+                    break;
+                default :
+                    break;
+            }
+            break;
+        case "tipoocorrencia":
+            switch ($action) {
+                case 'cadastrar':
+                    $tipo = $_GET['tipo'];
+                    $sql = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE tipo='$tipo'");
+                    if (mysqli_num_rows($sql) != 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência já existe.');
+                    } else {
+                        $sql_insert = mysqli_query($conect, "INSERT INTO tipo_ocorrencia (tipo) VALUES ('$tipo');");
+                    }
+                    break;
+                case 'editar':
+                    $tipo = $_GET['tipo'];
+                    $sql = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$action_id'");
+                    if (mysqli_num_rows($sql) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência não encontrada.');
+                    } else {
+                        $sql_insert = mysqli_query($conect, "UPDATE tipo_ocorrencia SET tipo='$tipo' WHERE idtipo_ocorrencia='$action_id';");
+                    }
+                    break;
+                case 'excluir':
+                    $sql = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$action_id'");
+                    if (mysqli_num_rows($sql) == 1) {
+                        mysqli_query($conect, "DELETE FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$action_id'");
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência não encontrado.');
+                    }
+                    break;
+                case 'listar':
+                    $pag = utf8_decode($_GET['listar_pag']);
+                    $maximo = utf8_decode($_GET['listar_qtd_itens']);
+                    $inicio = ($pag * $maximo) - $maximo;
+                    $qtd_geral = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia");
+                    $qtd_geral = mysqli_num_rows($qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral
+                    );
+                    array_push($result, $qtd_array);
+
+                    $resultados = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia ORDER BY tipo LIMIT $inicio, $maximo");
+                    if (mysqli_num_rows($resultados) > 0) {
+                        $vazio = false;
+                        while ($row = mysqli_fetch_array($resultados)) {
+                            $dados = array(
+                                'idtipo_ocorrencia' => utf8_encode($row["idtipo_ocorrencia"]),
+                                'tipo' => utf8_encode($row["tipo"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum tipo de ocorrência encontrado.');
+                    }
+                    break;
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhum tipo de ocorrência encontrado.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados);
+                        $dados = array(
+                            'idtipo_ocorrencia' => utf8_encode($row["idtipo_ocorrencia"]),
+                            'tipo' => utf8_encode($row["tipo"]),
                         );
                         array_push($result, $dados);
                     }
@@ -459,7 +541,7 @@ if (isset($_SESSION['usuario'])) {
                 case 'montar':
                     $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
-                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrado.');
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     } else {
                         $row = mysqli_fetch_array($resultados);
                         $id_peca = $row["idpeca"];
@@ -1061,20 +1143,24 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
 
-                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION ALL (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim))  ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
+                    $ids[] = "0";
+                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim)) ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
                     if (mysqli_num_rows($resultados) != 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
-                            $dados = array(
-                                'nome' => utf8_encode($row["nome"]),
-                                'usuario' => utf8_encode($row["usuario"]),
-                                'sexo' => utf8_encode($row["sexo"]),
-                                'ramal' => utf8_encode($row["ramal"]),
-                                'quarto' => utf8_encode($row["quarto"]),
-                                'senha' => utf8_encode($row["senha"]),
-                                'num' => utf8_encode($row["num"]),
-                                'bloqueado' => utf8_encode($row["bloqueado"]),
-                            );
-                            array_push($result, $dados);
+                            if (!in_array($row['usuario'], $ids)) {
+                                $dados = array(
+                                    'nome' => utf8_encode($row["nome"]),
+                                    'usuario' => utf8_encode($row["usuario"]),
+                                    'sexo' => utf8_encode($row["sexo"]),
+                                    'ramal' => utf8_encode($row["ramal"]),
+                                    'quarto' => utf8_encode($row["quarto"]),
+                                    'senha' => utf8_encode($row["senha"]),
+                                    'num' => utf8_encode($row["num"]),
+                                    'bloqueado' => utf8_encode($row["bloqueado"]),
+                                );
+                                array_push($result, $dados);
+                                $ids[] = $row["usuario"];
+                            }
                         }
                     }
                     //print_r($result);exit;
@@ -1084,36 +1170,61 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
                     } else {
-                        while ($row = mysqli_fetch_array($resultados)) {
-                            $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
-                            $row1 = mysqli_fetch_array($resultados1);
-                            if (mysqli_num_rows($resultados1) != 0) {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'permissao' => utf8_encode($row["permissao"]),
-                                    'bloqueado' => utf8_encode($row1["bloqueado"]),
+                        $row = mysqli_fetch_array($resultados);
+                        $usuario = $row["usuario"];
+                        $resultados2 = mysqli_query($conect, "SELECT * FROM acqua_db.bloqueio WHERE usuario='$usuario' ORDER BY data_inicio");
+                        $bloqueios = array('qtd_bloqueios' => mysqli_num_rows($resultados2));
+                        if (mysqli_num_rows($resultados2) > 0) {
+                            while ($row2 = mysqli_fetch_array($resultados2)) {
+                                $data_inicio = "";
+                                $data_fim = "";
+                                if ($row2['data_inicio'] != NULL) {
+                                    $data_inicio = date_format(date_create($row2['data_inicio']), 'd/m/Y H:i:s');
+                                }
+                                if ($row2['data_fim'] != NULL) {
+                                    $data_fim = date_format(date_create($row2['data_fim']), 'd/m/Y H:i:s');
+                                }
+                                $bloqueio = array(
+                                    'idbloqueio' => utf8_encode($row2['idbloqueio']),
+                                    'data_inicio' => $data_inicio,
+                                    'data_fim' => $data_fim,
+                                    'usuario' => utf8_encode($row2['usuario']),
+                                    'usuario_bloqueio' => utf8_encode($row2['usuario_bloqueio']),
+                                    'usuario_desbloqueio' => utf8_encode($row2['usuario_desbloqueio']),
                                 );
-                            } else {
-                                $dados = array(
-                                    'nome' => utf8_encode($row["nome"]),
-                                    'usuario' => utf8_encode($row["usuario"]),
-                                    'sexo' => utf8_encode($row["sexo"]),
-                                    'ramal' => utf8_encode($row["ramal"]),
-                                    'quarto' => utf8_encode($row["quarto"]),
-                                    'num' => utf8_encode($row["num"]),
-                                    'senha' => utf8_encode($row["senha"]),
-                                    'permissao' => utf8_encode($row["permissao"]),
-                                    'bloqueado' => '0',
-                                );
+                                array_push($bloqueios, $bloqueio);
                             }
-                            array_push($result, $dados);
                         }
+                        $resultados1 = mysqli_query($conect, "SELECT ISNULL(data_fim) as bloqueado FROM bloqueio WHERE usuario='$action_id' AND !ISNULL(data_inicio) AND ISNULL(data_fim);");
+                        $row1 = mysqli_fetch_array($resultados1);
+                        if (mysqli_num_rows($resultados1) != 0) {
+                            $dados = array(
+                                'nome' => utf8_encode($row["nome"]),
+                                'usuario' => utf8_encode($row["usuario"]),
+                                'sexo' => utf8_encode($row["sexo"]),
+                                'ramal' => utf8_encode($row["ramal"]),
+                                'quarto' => utf8_encode($row["quarto"]),
+                                'num' => utf8_encode($row["num"]),
+                                'senha' => utf8_encode($row["senha"]),
+                                'permissao' => utf8_encode($row["permissao"]),
+                                'bloqueado' => utf8_encode($row1["bloqueado"]),
+                                'bloqueios' => $bloqueios,
+                            );
+                        } else {
+                            $dados = array(
+                                'nome' => utf8_encode($row["nome"]),
+                                'usuario' => utf8_encode($row["usuario"]),
+                                'sexo' => utf8_encode($row["sexo"]),
+                                'ramal' => utf8_encode($row["ramal"]),
+                                'quarto' => utf8_encode($row["quarto"]),
+                                'num' => utf8_encode($row["num"]),
+                                'senha' => utf8_encode($row["senha"]),
+                                'permissao' => utf8_encode($row["permissao"]),
+                                'bloqueado' => '0',
+                                'bloqueios' => $bloqueios,
+                            );
+                        }
+                        array_push($result, $dados);
                     }
                     break;
                 case "bloquear":

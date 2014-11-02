@@ -98,6 +98,71 @@ switch (locale[4]) {
     case 'ocorrencia':
         listar('ocorrencia', 1, 10);
         break;
+    case 'tipoocorrencia':
+        listar('tipoocorrencia', 1, 10);
+        function cadastrar_tipoocorrencia() {
+            var tipo = $('input[name=tipo]').val();
+            if (tipo === "") {
+                alert_open("danger", "Todos os campos são obrigatórios.");
+            } else {
+                $.ajax({
+                    type: 'GET',
+                    url: 'action/action.php',
+                    dataType: 'json',
+                    data: {
+                        action_pagina: "tipoocorrencia",
+                        action: "cadastrar",
+                        tipo: tipo
+                    },
+                    success: function (retorno) {
+                        if (retorno.erro === false) {
+                            listar('tipoocorrencia', 1, 10);
+                            alert_open("success", "Cadastrado com sucesso.");
+                            $('#cs-form input').val('');
+                            $('#cs-form select').val('');
+                        } else {
+                            alert_open("danger", retorno.msg_erro);
+                        }
+                    },
+                    error: function () {
+                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                    }
+                });
+            }
+        }
+        function editar_tipoocorrencia() {
+            var id_editar = $('input[name=id-editar]').val();
+            var tipo = $('input[name=tipo]').val();
+            if (tipo === "") {
+                alert_open("danger", "Todos os campos são obrigatórios.");
+            } else {
+                $.ajax({
+                    type: 'GET',
+                    url: 'action/action.php',
+                    dataType: 'json',
+                    data: {
+                        action_pagina: "tipoocorrencia",
+                        action: "editar",
+                        tipo: tipo,
+                        action_id: id_editar
+                    },
+                    success: function (retorno) {
+                        if (retorno.erro === false) {
+                            listar('tipoocorrencia', 1, 10);
+                            alert_open("success", "Editado com sucesso.");
+                            $('#cs-form input').val('');
+                            $('#cs-form select').val('');
+                        } else {
+                            alert_open("danger", retorno.msg_erro);
+                        }
+                    },
+                    error: function () {
+                        alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                    }
+                });
+            }
+        }
+        break;
     case 'lancamento':
         $(document).ready(function () {
             $("#pecas-lancamento").multiSelect({
@@ -585,9 +650,9 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         for (var j = 1; j < a - 1; j++) {
                             if (retorno[j].ocorrenciastatus === "1") {
                                 $('div.cs-legenda').html('<span class="gray">*Peça com ocorrência ativa registrada</span>');
-                                html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="ocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
+                                html_tags += '<tr class="gray" data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             } else {
-                                html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="ocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
+                                html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="gerenciarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].ocorrenciadescricao + '</td><td>' + retorno[j].tipoocorrencia + '</td></tr>';
                             }
                         }
                         break;
@@ -685,6 +750,11 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
                         }
                         break;
+                    case "tipoocorrencia":
+                        for (var j = 1; j < a - 1; j++) {
+                            html_tags += '<tr data-id="' + retorno[j].idtipo_ocorrencia + '" data-pagina="tipoocorrencia" title="Clique para visualizar o tipo"><td>' + retorno[j].tipo + '</td></tr>';
+                        }
+                        break;
                     case "usuario-funcionario":
                         $('#cs-thead-dataGrid').html('<tr><th>Nome</th><th>Usuário</th><th>Telefone/Contato</th></tr>');
                         for (var j = 1; j < a - 1; j++) {
@@ -753,6 +823,9 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         case "editar_peca":
                             editar_peca();
                             break;
+                        case "editar_tipoocorrencia":
+                            editar_tipoocorrencia();
+                            break;
                         case "editar_usuario":
                             editar_usuario_funcionario();
                             break;
@@ -780,6 +853,12 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'ocorrencia':
+                            titulo_modal = 'Detalhes de Peça com Ocorrência';
+                            break;
+                        case 'tipoocorrencia':
+                            titulo_modal = 'Detalhes do Tipo de Ocorrência';
+                            break;
+                        case 'gerenciarcorrencia':
                             titulo_modal = 'Detalhes de Peça com Ocorrência';
                             break;
                         case 'lancamentospassados':
@@ -857,6 +936,11 @@ function pre_editar(pagina, id) {
                         $('input[name=cor]').val(retorno[0].cor);
                         $('input[name=tamanho]').val(retorno[0].tamanho);
                         $('select[name=tipo]').val(retorno[0].idtipo);
+                        break;
+                    case 'tipoocorrencia':
+                        $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
+                        $('input[name=tipo]').val(retorno[0].tipo);
+                        $('input[name=id-editar]').val(retorno[0].idtipo_ocorrencia);
                         break;
                     default:
                         break;
@@ -1020,6 +1104,13 @@ function modal_open(id, pagina, titulo) {
                                 html_body += '<li><strong>Status:</strong>Desbloqueado</li>';
                             }
                             html_body += '</ul>';
+                            if (retorno[0].bloqueios.qtd_bloqueios > 0) {
+                                html_body += '<br><div class="table-responsive"><div class="text-center">Bloqueios</div><table class="table table-condensed"><thead><tr><th>Data Início</th><th>Data Fim</th><th>Usuário Bloqueio</th><th>Usuário Desbloqueio</th></tr></thead><tbody>';
+                                for (var i = 0; i < retorno[0].bloqueios.qtd_bloqueios; i++) {
+                                    html_body += '<tr><td>' + retorno[0].bloqueios[i].data_inicio + '</td><td>' + retorno[0].bloqueios[i].data_fim + '</td><td>' + retorno[0].bloqueios[i].usuario_bloqueio + '</td><td>' + retorno[0].bloqueios[i].usuario_desbloqueio + '</td></tr>';
+                                }
+                                html_body += '</tbody></table></div>';
+                            }
                             html_footer = btn_reset_senha;
                             if (retorno[0].num === "") {
                                 html_footer += btn_atribuir_num;
@@ -1071,7 +1162,7 @@ function modal_open(id, pagina, titulo) {
                         if (pagina === "ocorrencia") {
                             html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th></tr></thead><tbody>';
                         } else {
-                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th><th>Opção</th></tr></thead><tbody>';
+                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th><th>Usuário Criação</th><th>Usuário Finalizou</th><th>Opção</th></tr></thead><tbody>';
                         }
                         for (var i = 0; i < retorno[0].ocorrencia.qtd_ocorrencias; i++) {
                             if (pagina === "ocorrencia") {
@@ -1079,9 +1170,9 @@ function modal_open(id, pagina, titulo) {
                             } else {
                                 var btn_finalizar = "";
                                 if (retorno[0].ocorrencia[i].status === "1") {
-                                    btn_finalizar = '<button type="button" data-id="' + retorno[0].ocorrencia[i].idocorrencia + '" class="btn btn-primary cs-finalizar-ocorrencia">Finalizar</button>';
+                                    btn_finalizar = '<button type="button" data-id="' + retorno[0].ocorrencia[i].idocorrencia + '" class="btn btn-primary cs-finalizar-ocorrencia-info">Finalizar</button>';
                                 }
-                                html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrencia + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td><td>' + btn_finalizar + '</td></tr>';
+                                html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrencia + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td><td>' + retorno[0].ocorrencia[i].usuario_criacao + '</td><td>' + retorno[0].ocorrencia[i].usuario_finalizou + '</td><td>' + btn_finalizar + '</td></tr>';
                             }
                         }
                         html_body += '</tbody></table></div>';
@@ -1184,11 +1275,43 @@ function modal_open(id, pagina, titulo) {
                     } else {
                         html_footer += '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
                     }
+                } else if (pagina === "tipoocorrencia") {
+                    html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                    html_body += '<li><strong>Tipo:</strong>' + retorno[0].tipo + '</li>';
+                    html_body += '</ul>';
+                    html_footer = btn_editar + btn_excluir;
                 }
                 $('.modal-title').html(titulo);
                 $('.modal-body').html(html_body);
                 $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
                 $('#cs-modal').modal('show');
+                $('button.cs-finalizar-ocorrencia-info').click(function () {
+                    modal_info('Deseja realmente finalizar a ocorrência?', 'Não será mais possível ativa-la novamente.', '<button type="button" data-id="' + $(this).attr('data-id') + '" class="btn btn-primary cs-finalizar-ocorrencia">Finalizar</button>');
+                    $('button.cs-finalizar-ocorrencia').click(function () {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'action/action.php',
+                            dataType: 'json',
+                            data: {
+                                action_pagina: 'gerenciarocorrencia',
+                                action: "finalizar",
+                                action_id: $(this).attr('data-id')
+                            },
+                            success: function (retorno) {
+                                if (retorno.erro === false) {
+                                    alert_open("success", "Ocorrência finalizada com sucesso.");
+                                    listar('gerenciarocorrencia', 1, 10);
+                                    $('#cs-modal').modal('hide');
+                                } else {
+                                    alert_open("danger", retorno.msg_erro);
+                                }
+                            },
+                            error: function () {
+                                alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                            }
+                        });
+                    });
+                });
                 $('#cs-modal .cs-conferir-peca').click(function () {
                     $(tr_clicada).addClass('cs-tr-blue');
                     $('#cs-modal').modal('hide');
@@ -1553,6 +1676,11 @@ function modal_open(id, pagina, titulo) {
                             html_body = "Não será possível recuperá-lo.";
                             html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Excluir</button>';
                             break;
+                        case "tipoocorrencia":
+                            titulo = "Deseja realmente excluir o tipo de ocorrência selecionado?";
+                            html_body = "Não será possível recuperá-lo.";
+                            html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Excluir</button>';
+                            break;
                         default :
                             break;
                     }
@@ -1739,6 +1867,9 @@ $(document).ready(function () {
             case 'cadastrar_numero':
                 cadastrar_numero();
                 break;
+            case 'cadastrar_tipoocorrencia':
+                cadastrar_tipoocorrencia();
+                break;
             default:
                 break;
         }
@@ -1747,6 +1878,7 @@ $(document).ready(function () {
         atribuir_numero_auto();
     });
     $('button.cs-cancelar').click(function () {
+        $('span#cs-action').html("Cadastrar");
         limpar_form_cadastro();
     });
     $('button.cs-logar').click(function () {

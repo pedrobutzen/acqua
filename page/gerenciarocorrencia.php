@@ -1,10 +1,10 @@
 <?php
-$menu_page_active = "peca";
+$menu_page_active = "ocorrencia";
 ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="col-lg-12">
-            <h2>Gerenciar Ocorrência <small>Gerenciar peças com ocorrencia.</small></h2>
+            <h2>Peça com Ocorrência <small>Visualizar peças com ocorrencia, finalizar ocorrencia ativa.</small></h2>
             <hr>
             <div class="row-fluid">
                 <div class="col-lg-3 cs-p-botton25">

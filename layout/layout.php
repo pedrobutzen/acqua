@@ -87,12 +87,12 @@ include_once 'conexao/conexao.php';
                             }
                             if ($_SESSION['usuario']['permissao'] == '0') {
                                 ?>
-                                <li id="peca" class="dropdown">
-                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Peça <span class="caret"></a>
+                                <li id="ocorrencia" class="dropdown">
+                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Ocorrência <span class="caret"></a>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li><a href="<?php echo $caminho ?>visualizarpeca">Visualizar Peça</a></li>
+                                        <li><a href="<?php echo $caminho ?>cadastrarocorrencia">Cadastrar Ocorrência</a></li>
                                         <li class="divider"></li>
-                                        <li><a href="<?php echo $caminho ?>gerenciarocorrencia">Gerenciar Ocorrência</a></li>
+                                        <li><a href="<?php echo $caminho ?>gerenciarocorrencia">Peças com Ocorrência</a></li>
                                         <li><a href="<?php echo $caminho ?>tipoocorrencia">Cadastrar Tipo de Ocorrência</a></li>
                                     </ul>
                                 </li>

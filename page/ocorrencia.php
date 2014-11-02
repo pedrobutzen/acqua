@@ -1,5 +1,5 @@
 <?php
-$menu_page_active = "peca";
+$menu_page_active = "ocorrencia";
 ?>
 <div class="container-fluid">
     <div class="row-fluid">
