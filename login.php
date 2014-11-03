@@ -17,16 +17,21 @@
         <script src="view/js/script.js" type="text/javascript"></script>
         <script src="view/js/action.js" type="text/javascript"></script>
     </head>
-    <body class="bg-blue"> <div class="text-center"><img src="view/img/unasp-top.png" /></div> 
-        <div class="form-box" id="login-box"> 
-            <div class="text-center header"><img src="view/img/logo.png" /></div> 
-            <div class="form-group">
-                <input type="text" name="usuario" class="form-control" placeholder="Usuário">
+    <body class="bg-blue"> 
+        <div class="text-center"><img src="view/img/unasp-top.png" /></div> 
+        <div class="container">
+            <div class="row">
+                <div class="text-center col-lg-8"><img src="view/img/logo_login.png" /></div> 
+                <div class="form-box col-lg-4" id="login-box"> 
+                    <div class="form-group">
+                        <input type="text" name="usuario" class="form-control" placeholder="Usuário">
+                    </div>
+                    <div class="form-group text-right">
+                        <input type="password" name="senha" class="form-control" placeholder="Senha">
+                    </div>
+                    <button type="button" class="btn btn-block btn-outline cs-logar btn-danger">Entrar</button>
+                </div>
             </div>
-            <div class="form-group text-right">
-                <input type="password" name="senha" class="form-control" placeholder="Senha">
-            </div>
-            <button type="button" class="btn btn-block btn-outline cs-logar btn-danger">Entrar</button>
         </div>
         <div class="alert alert-success cs-alert" id="cs-alert-success">
             <button type="button" class="close close-success">&times;</button>

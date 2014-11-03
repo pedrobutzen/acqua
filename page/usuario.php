@@ -38,8 +38,7 @@ $menu_page_active = "usuario";
                                 <label>Permissão*</label><label class="pull-right"></label>
                                 <select class="form-control" name="usuario_permissao">
                                     <option value="">Selecione</option>
-                                    <option value="0">Total</option>
-                                    <option value="1">Parcial</option>
+                                    <option value="1">Total</option>
                                     <option value="2">Visualização Relatórios/Gráficos</option>
                                 </select>
                             </div>
@@ -56,9 +55,9 @@ $menu_page_active = "usuario";
                         <li class="active cs-li-funcionario"><a href="javascript:;" id="cs-dataGrid-funcionario">Funcionário</a></li>
                         <li class="cs-li-aluno"><a href="javascript:;" id="cs-dataGrid-aluno">Aluno</a></li>
                         <div class="input-group cs-search pull-right">
-                            <input type="text" class="form-control" placeholder="Pesquisar">
+                            <input type="text" class="form-control" name="pesquisa" placeholder="Pesquisar">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
+                                <button class="btn btn-default cs-btn-pesquisar-usuario" type="button">
                                     <i class="ion ion-search"></i>
                                 </button>
                             </span>

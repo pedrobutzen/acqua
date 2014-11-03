@@ -82,41 +82,45 @@ include_once 'conexao/conexao.php';
                                         <li><a href="<?php echo $caminho ?>lancamentospassados">Lançamentos passados</a></li>
                                     </ul>
                                 </li>
-                                <li id="graficos" class=""><a id="button" href="<?php echo $caminho ?>graficosaluno">Gráficos/Relatórios</a></li>
+                                <?php
+                            } elseif ($_SESSION['usuario']['permissao'] == '2') {
+                                ?>
+                                <li id="relatorio" class=""><a id="button" href="<?php echo $caminho ?>relatorio">Relatório</a></li>
+                                <?php
+                            } elseif ($_SESSION['usuario']['permissao'] == '1') {
+                                ?>
+                                <li id = "ocorrencia" class = "dropdown">
+                                    <a href = "" class = "dropdown-toggle" data-toggle = "dropdown">Ocorrência <span class = "caret"></a>
+                                    <ul class = "dropdown-menu" role = "menu">
+                                        <li><a href = "<?php echo $caminho ?>cadastrarocorrencia">Cadastrar Ocorrência</a></li>
+                                        <li class = "divider"></li>
+                                        <li><a href = "<?php echo $caminho ?>gerenciarocorrencia">Peças com Ocorrência</a></li>
+                                        <li><a href = "<?php echo $caminho ?>tipoocorrencia">Cadastrar Tipo de Ocorrência</a></li>
+                                    </ul>
+                                </li>
+                                <li id = "lancamento" class = "dropdown">
+                                    <a href = "" class = "dropdown-toggle" data-toggle = "dropdown">Lançamento <span class = "caret"></a>
+                                    <ul class = "dropdown-menu" role = "menu">
+                                        <li><a href = "<?php echo $caminho ?>visualizarlancamento">Visualizar Lançamento</a></li>
+                                        <li class = "divider"></li>
+                                        <li><a href = "<?php echo $caminho ?>entradapeca">Entrada de Peça</a></li>
+                                        <li class = "divider"></li>
+                                        <li><a href = "<?php echo $caminho ?>saidapeca">Saída de Peça</a></li>
+                                    </ul>
+                                </li>
+                                <li id = "usuario" class = "dropdown">
+                                    <a href = "" class = "dropdown-toggle" data-toggle = "dropdown">Usuário <span class = "caret"></a>
+                                    <ul class = "dropdown-menu" role = "menu">
+                                        <li><a href = "<?php echo $caminho ?>usuario">Gerenciar Usuário</a></li>
+                                        <li class = "divider"></li>
+                                        <li><a href = "<?php echo $caminho ?>numero">Gerenciar Número</a></li>
+                                        <li><a href = "<?php echo $caminho ?>atribuirnumero">Atribuir Número Automaticamente</a></li>
+                                    </ul>
+                                </li>
+                                <li id = "relatorio" class = ""><a id = "button" href = "<?php echo $caminho ?>relatorio">Relatório</a></li>
                                 <?php
                             }
-                            if ($_SESSION['usuario']['permissao'] == '0') {
-                                ?>
-                                <li id="ocorrencia" class="dropdown">
-                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Ocorrência <span class="caret"></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a href="<?php echo $caminho ?>cadastrarocorrencia">Cadastrar Ocorrência</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="<?php echo $caminho ?>gerenciarocorrencia">Peças com Ocorrência</a></li>
-                                        <li><a href="<?php echo $caminho ?>tipoocorrencia">Cadastrar Tipo de Ocorrência</a></li>
-                                    </ul>
-                                </li>
-                                <li id="lancamento" class="dropdown">
-                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Lançamento <span class="caret"></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a href="<?php echo $caminho ?>visualizarlancamento">Visualizar Lançamento</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="<?php echo $caminho ?>entradapeca">Entrada de Peça</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="<?php echo $caminho ?>saidapeca">Saída de Peça</a></li>
-                                    </ul>
-                                </li>
-                                <li id="usuario" class="dropdown">
-                                    <a href="" class="dropdown-toggle" data-toggle="dropdown">Usuário <span class="caret"></a>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a href="<?php echo $caminho ?>usuario">Gerenciar Usuário</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="<?php echo $caminho ?>numero">Gerenciar Número</a></li>
-                                        <li><a href="<?php echo $caminho ?>atribuirnumero">Atribuir Número Automaticamente</a></li> 
-                                    </ul>
-                                </li>
-
-                            <?php } ?>
+                            ?>
                         </ul>
                         <ul class="nav navbar-top-links navbar-right">
                             <li class="dropdown">

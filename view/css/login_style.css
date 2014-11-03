@@ -3,10 +3,10 @@
 }
 .form-box {
     width: 360px;
-    margin: 90px auto 0 auto;
+    margin: 10px auto 0 auto;
 }
-.form-box .header {
-    padding-bottom: 15px;
+.header {
+    margin-top: 45px;
 }
 .form-box  .form-group {
     margin-top: 20px;
@@ -16,4 +16,7 @@
     right: 50px;
     position: absolute;
     z-index: 99999;
+}
+.container{
+ margin-top: 110px;
 }

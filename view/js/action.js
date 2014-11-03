@@ -251,6 +251,10 @@ switch (locale[4]) {
         action_id_local = "";
         listar('gerenciarocorrencia', 1, 10);
         break;
+    case 'cadastrarocorrencia':
+        action_id_local = "";
+        listar('cadastrarocorrencia', 1, 10);
+        break;
     case 'visualizarlancamento':
         action_id_local = "";
         listar('visualizarlancamentousuario', 1, 10);
@@ -656,6 +660,12 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             }
                         }
                         break;
+                    case "cadastrarocorrencia":
+                        $('div.cs-legenda').html('');
+                        for (var j = 1; j < a - 1; j++) {
+                            html_tags += '<tr data-id="' + retorno[j].idpeca + '" data-pagina="cadastrarocorrencia" title="Clique para detalhar peça"><td>' + retorno[j].descricao + '</td><td>' + retorno[j].nometipo + '</td><td>' + retorno[j].marca + '</td><td>' + retorno[j].cor + '</td><td>' + retorno[j].tamanho + '</td></tr>';
+                        }
+                        break;
                     case "ocorrencia":
                         $('div.cs-legenda').html('');
                         for (var j = 1; j < a - 1; j++) {
@@ -756,6 +766,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         }
                         break;
                     case "usuario-funcionario":
+                        $('input[name=pesquisa]').val(action_id_local);
                         $('#cs-thead-dataGrid').html('<tr><th>Nome</th><th>Usuário</th><th>Telefone/Contato</th></tr>');
                         for (var j = 1; j < a - 1; j++) {
                             var class_tr = '';
@@ -777,6 +788,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         $('div.cs-legenda').html('<span class="label-danger">Total</span> - <span class="label-warning">Parcial</span> - <span class="label-success">Visualização Relatórios/Gráficos</span>');
                         break;
                     case "usuario-aluno":
+                        $('input[name=pesquisa]').val(action_id_local);
                         $('#cs-thead-dataGrid').html('<tr><th>Nome</th><th>Usuário</th><th>Ramal</th><th>Quarto</th></tr>');
                         $('div.cs-legenda').html('');
                         $('div.cs-legenda').html('<span class="label-danger">Aluno bloqueado</span> <span class="gray">Aluno sem número</span>');
@@ -883,10 +895,13 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                     });
                 });
             } else {
+                $('input[name=pesquisa]').val(action_id_local);
+                $('#cs-dataGrid').html("");
                 alert_open("danger", retorno.msg_erro);
             }
         },
         error: function () {
+            $('#cs-dataGrid').html("");
             alert_open("danger", "Impossível listar " + action_pagina);
         }
     });
@@ -1148,6 +1163,7 @@ function modal_open(id, pagina, titulo) {
                     html_footer = btn_editar + btn_excluir;
                 } else if (pagina === "ocorrencia" || pagina === "gerenciarocorrencia") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                    html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
                     html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
                     html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
                     html_body += '<li><strong>Cor:</strong>' + retorno[0].cor + '</li>';
@@ -1195,7 +1211,7 @@ function modal_open(id, pagina, titulo) {
                         html_body += '</tbody></table></div>';
                     }
                     html_footer = "";
-                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca" || pagina === "usuariovisualizarlancamento" || pagina === "usuariogerenciarocorrencia") {
+                } else if (pagina === "usuarioentradapeca" || pagina === "usuariosaidapeca" || pagina === "usuariovisualizarlancamento" || pagina === "usuariogerenciarocorrencia" || pagina === "usuariocadastrarocorrencia") {
                     html_footer = "";
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
@@ -1242,6 +1258,10 @@ function modal_open(id, pagina, titulo) {
                             html_footer += '<button type="button" class="btn btn-primary cs-conf-usuario-ocorrencia">Confirmar Usuário</button>';
                             action_id_local = retorno[0].usuario;
                             break;
+                        case 'usuariocadastrarocorrencia':
+                            html_footer += '<button type="button" class="btn btn-primary cs-conf-usuario-cadastrar-ocorrencia">Confirmar Usuário</button>';
+                            action_id_local = retorno[0].usuario;
+                            break;
                         default:
                             break;
                     }
@@ -1275,6 +1295,31 @@ function modal_open(id, pagina, titulo) {
                     } else {
                         html_footer += '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
                     }
+                } else if (pagina === "cadastrarocorrencia") {
+                    html_body = '<ul class="list-unstyled" id="cs-list-modal">';
+                    html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                    html_body += '<li><strong>Descrição:</strong>' + retorno[0].descricaopeca + '</li>';
+                    html_body += '<li><strong>Marca:</strong>' + retorno[0].marca + '</li>';
+                    html_body += '<li><strong>Cor:</strong>' + retorno[0].cor + '</li>';
+                    html_body += '<li><strong>Tamanho:</strong>' + retorno[0].tamanho + '</li>';
+                    html_body += '<li><strong>Tipo:</strong>' + retorno[0].nometipo + '</li>';
+                    html_body += '</ul>';
+
+                    if (retorno[0].ocorrencia.qtd_ocorrencias > 0) {
+                        var status_ocorrencia = Array();
+                        status_ocorrencia["0"] = "Finalizada";
+                        status_ocorrencia["1"] = "Ativa";
+                        if (pagina === "ocorrencia") {
+                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th></tr></thead><tbody>';
+                        } else {
+                            html_body += '<br><div class="table-responsive"><div class="text-center">Ocorrências</div><table class="table table-condensed"><thead><tr><th>Descrição</th><th>Tipo</th><th>Status</th><th>Usuário Criação</th><th>Usuário Finalizou</th></tr></thead><tbody>';
+                        }
+                        for (var i = 0; i < retorno[0].ocorrencia.qtd_ocorrencias; i++) {
+                            html_body += '<tr><td>' + retorno[0].ocorrencia[i].descricao + '</td><td>' + retorno[0].ocorrencia[i].tipoocorrencia + '</td><td>' + status_ocorrencia[retorno[0].ocorrencia[i].status] + '</td><td>' + retorno[0].ocorrencia[i].usuario_criacao + '</td><td>' + retorno[0].ocorrencia[i].usuario_finalizou + '</td></tr>';
+                        }
+                        html_body += '</tbody></table></div>';
+                    }
+                    html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-cadastrarocorrencia-lancamento-info">Nova Ocorrência</button>';
                 } else if (pagina === "tipoocorrencia") {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Tipo:</strong>' + retorno[0].tipo + '</li>';
@@ -1533,6 +1578,10 @@ function modal_open(id, pagina, titulo) {
                 });
                 $('button.cs-conf-usuario-ocorrencia').click(function () {
                     listar('gerenciarocorrencia', 1, 10);
+                    $('#cs-modal').modal('hide');
+                });
+                $('button.cs-conf-usuario-cadastrar-ocorrencia').click(function () {
+                    listar('cadastrarocorrencia', 1, 10);
                     $('#cs-modal').modal('hide');
                 });
                 $('#cs-modal .cs-bloquear').click(function () {
@@ -1802,6 +1851,23 @@ function modal_open(id, pagina, titulo) {
     });
 }
 $(document).ready(function () {
+    $('button.cs-btn-pesquisar-usuario').click(function () {
+        if ($('.cs-li-aluno').hasClass('active')) {
+            action_id_local = $('input[name=pesquisa]').val();
+            if (action_id_local !== "") {
+                listar("usuario-aluno", 1, 10);
+            } else {
+                alert_open("danger", "Campo pesquisa é obrigatório.");
+            }
+        } else if ($('.cs-li-funcionario').hasClass('active')) {
+            action_id_local = $('input[name=pesquisa]').val();
+            if (action_id_local !== "") {
+                listar("usuario-funcionario", 1, 10);
+            } else {
+                alert_open("danger", "Campo pesquisa é obrigatório.");
+            }
+        }
+    });
     $('button.cs-pesquisar').click(function () {
         var ra = $('input[name=ra]').val();
         var numero = $('input[name=numero]').val();
@@ -1831,11 +1897,13 @@ $(document).ready(function () {
         }
     });
     $('a#cs-dataGrid-funcionario').click(function () {
+        action_id_local = "";
         listar('usuario-funcionario', 1, 10);
         $('.cs-li-aluno').removeClass('active');
         $('.cs-li-funcionario').addClass('active');
     });
     $('a#cs-dataGrid-aluno').click(function () {
+        action_id_local = "";
         listar('usuario-aluno', 1, 10);
         $('.cs-li-funcionario').removeClass('active');
         $('.cs-li-aluno').addClass('active');

@@ -12,7 +12,6 @@ $action = $_GET['action'];
 if (session_id() == '') {
     session_start();
 }
-
 if (isset($_SESSION['usuario'])) {
     $usuario_logado = $_SESSION['usuario']['usuario'];
     switch ($action_pagina) {
@@ -250,6 +249,93 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
+        case "cadastrarocorrencia":
+            switch ($action) {
+                case 'listar':
+                    $pag = utf8_decode($_GET['listar_pag']);
+                    $maximo = utf8_decode($_GET['listar_qtd_itens']);
+                    $inicio = ($pag * $maximo) - $maximo;
+                    if ($action_id == "") {
+                        $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo)");
+                    } else {
+                        $qtd_geral = mysqli_query($conect, "SELECT peca.idpeca FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$action_id'");
+                    }
+                    $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
+                    $qtd_array = array(
+                        'qtd_geral' => $qtd_geral_idioma
+                    );
+                    array_push($result, $qtd_array);
+                    if ($action_id == "") {
+                        $resultados = mysqli_query($conect, "SELECT peca.*, tipo.nome as nometipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) ORDER BY tipo.nome, peca.descricao LIMIT $inicio, $maximo");
+                    } else {
+                        $resultados = mysqli_query($conect, "SELECT peca.*, tipo.nome as nometipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$action_id' ORDER BY tipo.nome, peca.descricao LIMIT $inicio, $maximo");
+                    }
+                    if (mysqli_num_rows($resultados) > 0) {
+                        $vazio = false;
+                        while ($row = mysqli_fetch_array($resultados)) {
+                            $dados = array(
+                                'idpeca' => utf8_encode($row["idpeca"]),
+                                'descricao' => utf8_encode($row["descricao"]),
+                                'marca' => utf8_encode($row["marca"]),
+                                'cor' => utf8_encode($row["cor"]),
+                                'tamanho' => utf8_encode($row["tamanho"]),
+                                'nometipo' => utf8_encode($row["nometipo"]),
+                            );
+                            array_push($result, $dados);
+                        }
+                    } else {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
+                    }
+                    break;
+                case 'montar':
+                    $resultados = mysqli_query($conect, "SELECT peca.usuario, peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
+                    if (mysqli_num_rows($resultados) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
+                    } else {
+                        $row = mysqli_fetch_array($resultados);
+                        $id_peca = $row["idpeca"];
+                        $resultados1 = mysqli_query($conect, "SELECT ocorrencia.*, tipo_ocorrencia.tipo FROM ocorrencia JOIN(tipo_ocorrencia) ON(ocorrencia.idtipo_ocorrencia=tipo_ocorrencia.idtipo_ocorrencia)  WHERE idpeca='$id_peca' ORDER BY status DESC");
+                        $ocorrencias = array('qtd_ocorrencias' => mysqli_num_rows($resultados1));
+                        if (mysqli_num_rows($resultados1) > 0) {
+                            while ($row2 = mysqli_fetch_array($resultados1)) {
+                                $ocorrencia = array(
+                                    'idocorrencia' => utf8_encode($row2['idocorrencia']),
+                                    'descricao' => utf8_encode($row2['descricao']),
+                                    'status' => utf8_encode($row2['status']),
+                                    'idpeca' => utf8_encode($row2['idpeca']),
+                                    'tipoocorrencia' => utf8_encode($row2['tipo']),
+                                    'usuario_criacao' => utf8_encode($row2['usuario_criacao']),
+                                    'usuario_finalizou' => utf8_encode($row2['usuario_finalizou']),
+                                );
+                                array_push($ocorrencias, $ocorrencia);
+                            }
+                        }
+                        $dados = array(
+                            'idpeca' => utf8_encode($row["idpeca"]),
+                            'descricaopeca' => utf8_encode($row["descricao"]),
+                            'usuario' => utf8_encode($row["usuario"]),
+                            'marca' => utf8_encode($row["marca"]),
+                            'cor' => utf8_encode($row["cor"]),
+                            'tamanho' => utf8_encode($row["tamanho"]),
+                            'idtipo' => utf8_encode($row["idtipo"]),
+                            'nometipo' => utf8_encode($row["nometipo"]),
+                            'ocorrencia' => $ocorrencias,
+                        );
+                        array_push($result, $dados);
+                    }
+                    break;
+                case 'finalizar':
+                    $sql_ocorrencia = mysqli_query($conect, "SELECT status FROM ocorrencia WHERE idocorrencia='$action_id'");
+                    if (mysqli_num_rows($sql_ocorrencia) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Ocorrência não encontrada.');
+                    } else {
+                        $sql_update = mysqli_query($conect, "UPDATE ocorrencia SET status='0', usuario_finalizou='$usuario_logado' WHERE idocorrencia='$action_id';");
+                    }
+                    break;
+                default :
+                    break;
+            }
+            break;
         case "gerenciarocorrencia":
             switch ($action) {
                 case 'listar':
@@ -322,7 +408,7 @@ if (isset($_SESSION['usuario'])) {
                     }
                     break;
                 case 'montar':
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
+                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.usuario, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     } else {
@@ -347,6 +433,7 @@ if (isset($_SESSION['usuario'])) {
                         $dados = array(
                             'idpeca' => utf8_encode($row["idpeca"]),
                             'descricaopeca' => utf8_encode($row["descricao"]),
+                            'usuario' => utf8_encode($row["usuario"]),
                             'marca' => utf8_encode($row["marca"]),
                             'cor' => utf8_encode($row["cor"]),
                             'tamanho' => utf8_encode($row["tamanho"]),
@@ -453,7 +540,7 @@ if (isset($_SESSION['usuario'])) {
                         if (mysqli_num_rows($sql_tipo) == 0) {
                             $result = array('erro' => true, 'msg_erro' => 'Tipo selecionado não encontrado.');
                         } else {
-                            $sql_insert_lancamento = mysqli_query($conect, "INSERT INTO ocorrencia (descricao, status, idpeca, idtipo_ocorrencia) VALUES ('$descricao', '1', '$idpeca', '$idtipo_ocorrencia');");
+                            $sql_insert_lancamento = mysqli_query($conect, "INSERT INTO ocorrencia (descricao, status, idpeca, idtipo_ocorrencia, usuario_criacao) VALUES ('$descricao', '1', '$idpeca', '$idtipo_ocorrencia', '$usuario_logado');");
                             $id_lancamento = mysqli_insert_id($conect);
                         }
                     }
@@ -975,7 +1062,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariogerenciarocorrencia"):
+        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariogerenciarocorrencia" || $action_pagina == "usuariocadastrarocorrencia"):
             switch ($action) {
                 case 'montar':
                     $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
@@ -1078,14 +1165,21 @@ if (isset($_SESSION['usuario'])) {
                     $pag = utf8_decode($_GET['listar_pag']);
                     $maximo = utf8_decode($_GET['listar_qtd_itens']);
                     $inicio = ($pag * $maximo) - $maximo;
-                    $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('0', '1', '2')");
+                    if ($action_id == "") {
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('0', '1', '2')");
+                    } else {
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('0', '1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%')");
+                    }
                     $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
                     $qtd_array = array(
                         'qtd_geral' => $qtd_geral_idioma
                     );
                     array_push($result, $qtd_array);
-
-                    $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('0', '1', '2') ORDER BY nome LIMIT $inicio, $maximo");
+                    if ($action_id == "") {
+                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('0', '1', '2') ORDER BY nome LIMIT $inicio, $maximo");
+                    } else {
+                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('0', '1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%') ORDER BY nome LIMIT $inicio, $maximo");
+                    }
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
                     } else {
@@ -1136,7 +1230,11 @@ if (isset($_SESSION['usuario'])) {
                     $pag = utf8_decode($_GET['listar_pag']);
                     $maximo = utf8_decode($_GET['listar_qtd_itens']);
                     $inicio = ($pag * $maximo) - $maximo;
-                    $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao='3'");
+                    if ($action_id == "") {
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao='3'");
+                    } else {
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao='3' AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%$action_id%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%') ");
+                    }
                     $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
                     $qtd_array = array(
                         'qtd_geral' => $qtd_geral_idioma
@@ -1144,7 +1242,11 @@ if (isset($_SESSION['usuario'])) {
                     array_push($result, $qtd_array);
 
                     $ids[] = "0";
-                    $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim)) ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
+                    if ($action_id == "") {
+                        $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3') UNION (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim)) ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
+                    } else {
+                        $resultados = mysqli_query($conect, "(SELECT usuario.*, '0' as bloqueado FROM usuario WHERE permissao='3' AND (usuario.usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%$action_id%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%')) UNION (SELECT usuario.*, ISNULL(bloqueio.data_fim) as bloqueado FROM usuario JOIN(bloqueio) ON(usuario.usuario=bloqueio.usuario) WHERE permissao='3' AND ISNULL(bloqueio.data_fim) AND (usuario.usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%$action_id%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%')) ORDER BY bloqueado DESC, nome ASC LIMIT $inicio, $maximo");
+                    }
                     if (mysqli_num_rows($resultados) != 0) {
                         while ($row = mysqli_fetch_array($resultados)) {
                             if (!in_array($row['usuario'], $ids)) {
