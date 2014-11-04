@@ -21,7 +21,7 @@
         <div class="text-center"><img src="view/img/unasp-top.png" /></div> 
         <div class="container">
             <div class="row">
-                <div class="text-center col-lg-8"><img src="view/img/logo_login.png" /></div> 
+                <div class="text-center col-lg-8"><img src="view/img/logo.png" /></div> 
                 <div class="form-box col-lg-4" id="login-box"> 
                     <div class="form-group">
                         <input type="text" name="usuario" class="form-control" placeholder="Usuário">

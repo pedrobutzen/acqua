@@ -152,7 +152,7 @@ if (isset($_SESSION['usuario'])) {
                             'marca' => utf8_encode($row["marca"]),
                             'cor' => utf8_encode($row["cor"]),
                             'tamanho' => utf8_encode($row["tamanho"]),
-                            'idtipo' => utf8_encode($row["idtipo"]),
+                            'idtipo' => $row["idtipo"],
                             'nometipo' => utf8_encode($row["nometipo"]),
                             'ocorrencia' => $ocorrencias,
                         );
@@ -1361,6 +1361,16 @@ if (isset($_SESSION['usuario'])) {
             break;
         case "usuario":
             switch ($action) {
+                case 'alterar_senha':
+                    $senha_nova = $_GET['senha_nova'];
+                    $senha_atual = $_GET['senha_atual'];
+                    $sql = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$usuario_logado' AND senha='$senha_atual'");
+                    if (mysqli_num_rows($sql) == 0) {
+                        $result = array('erro' => true, 'msg_erro' => 'Senha atual incorreta.');
+                    } else {
+                        $sql = mysqli_query($conect, "UPDATE usuario SET senha='$senha_nova' WHERE usuario='$usuario_logado';");
+                    }
+                    break;
                 case 'reset_senha':
                     $sql = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id'");
                     if (mysqli_num_rows($sql) == "0") {

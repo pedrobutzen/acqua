@@ -3,7 +3,7 @@
 header('Content-type: text/html; charset=UTF-8');
 include_once '../conexao/conexao.php';
 
-$resultados = mysqli_query($conect, "SELECT u.usuario FROM lancamento as l JOIN(usuario as u) ON(u.usuario=l.usuario) WHERE ISNULL(l.data_devolucao) AND !ISNULL(l.data_recebimento) AND u.sexo='m'");
+$resultados = mysqli_query($conect, "SELECT u.usuario FROM lancamento as l JOIN(usuario as u) ON(u.usuario=l.usuario) WHERE ISNULL(l.data_devolucao) AND !ISNULL(l.data_recebimento) AND u.sexo='f'");
 if (mysqli_num_rows($resultados) > 0) {
     while ($row = mysqli_fetch_array($resultados)) {
         $usuario_bloquear = $row['usuario'];
@@ -14,7 +14,7 @@ if (mysqli_num_rows($resultados) > 0) {
     }
 }
 
-$resultados_desbloqueio = mysqli_query($conect, "SELECT usuario.usuario, bloqueio.data_inicio, bloqueio.idbloqueio FROM bloqueio JOIN(usuario) ON(bloqueio.usuario=usuario.usuario) WHERE usuario_bloqueio='sistema' AND ISNULL(data_fim) AND usuario.sexo='m'");
+$resultados_desbloqueio = mysqli_query($conect, "SELECT usuario.usuario, bloqueio.data_inicio, bloqueio.idbloqueio FROM bloqueio JOIN(usuario) ON(bloqueio.usuario=usuario.usuario) WHERE usuario_bloqueio='sistema' AND ISNULL(data_fim) AND usuario.sexo='f'");
 if (mysqli_num_rows($resultados_desbloqueio) > 0) {
     while ($row = mysqli_fetch_array($resultados_desbloqueio)) {
         $usuario_desloquear = $row['usuario'];

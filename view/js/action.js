@@ -170,7 +170,7 @@ switch (locale[4]) {
                 selectableHeader: "<div>Peças disponíveis para lavagem</div>",
                 selectionHeader: "<div>Peças para Lavar - (<span id=\'qtd-pecas\'>15</span> peças restantes)</div>",
                 selectableFooter: "<div>Clique na descrição da peça para marcar</div>",
-                selectionFooter: "<div>Clique na descrição da peça para remover da lavegem</div>",
+                selectionFooter: "<div>Clique na descrição da peça para remover da lavagem</div>",
                 afterSelect: function () {
                     verifica_qtd_marcados();
                 },
@@ -771,21 +771,18 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         for (var j = 1; j < a - 1; j++) {
                             var class_tr = '';
                             switch (retorno[j].permissao) {
-                                case '0':
+                                case '1':
                                     class_tr = 'danger';
                                     break;
-                                case '1':
-                                    class_tr = 'warning';
-                                    break;
                                 case '2':
-                                    class_tr = 'success';
+                                    class_tr = 'warning';
                                     break;
                                 default:
                                     break;
                             }
                             html_tags += '<tr class="' + class_tr + '" data-id="' + retorno[j].usuario + '" data-pagina="usuario-funcionario" title="Clique para detalhar usuário"><td>' + retorno[j].nome + '</td><td>' + retorno[j].usuario + '</td><td>' + retorno[j].ramal + '</td></tr>';
                         }
-                        $('div.cs-legenda').html('<span class="label-danger">Total</span> - <span class="label-warning">Parcial</span> - <span class="label-success">Visualização Relatórios/Gráficos</span>');
+                        $('div.cs-legenda').html('<span class="label-danger">Total</span> - <span class="label-warning">Visualização Relatórios/Gráficos</span>');
                         break;
                     case "usuario-aluno":
                         $('input[name=pesquisa]').val(action_id_local);
@@ -1964,5 +1961,38 @@ $(document).ready(function () {
     });
     $('a.cs-deslogar').click(function () {
         deslogar();
+    });
+    $('button.cs-alterar-senha').click(function () {
+        var senha_atual = $('input[name=senha_atual]').val();
+        var senha_nova = $('input[name=senha_nova]').val();
+        var senha_nova_repetir = $('input[name=senha_nova_repetir]').val();
+        if (senha_atual === "" || senha_nova === "" || senha_nova_repetir === "") {
+            alert_open("danger", "Todos os campos são obrigatórios");
+        } else if (senha_nova !== senha_nova_repetir) {
+            alert_open("danger", "Você deve digitar a mesma senha duas vezes.");
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: 'action/action.php',
+                dataType: 'json',
+                data: {
+                    action_pagina: 'usuario',
+                    action: "alterar_senha",
+                    senha_atual: senha_atual,
+                    senha_nova: senha_nova
+                },
+                success: function (retorno) {
+                    if (retorno.erro === false) {
+                        $('.navbar-top-links input').val('');
+                        alert_open("success", "Senha alterada com sucesso.");
+                    } else {
+                        alert_open("danger", retorno.msg_erro);
+                    }
+                },
+                error: function () {
+                    alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                }
+            });
+        }
     });
 });

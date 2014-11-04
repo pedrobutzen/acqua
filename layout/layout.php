@@ -125,34 +125,34 @@ include_once 'conexao/conexao.php';
                         <ul class="nav navbar-top-links navbar-right">
                             <li class="dropdown">
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="Alterar senha">
-                                    <i class="ion ion-key ion-size-large pull-right"></i></i>
+                                    <i class="ion ion-key ion-size-large pull-right"></i>
                                 </a>
-                                <ul class="dropdown-menu dropdown-messages">
+                                <div class="dropdown-menu">
                                     <div class="panel panel-default">
                                         <div class="panel-heading text-center">
                                             Alterar Senha
                                         </div>
-                                        <div class="panel-body cs-form">
-                                            <div class="form-group">
-                                                <label>Senha Atual</label>
-                                                <input type="text" name="nome" class="form-control">
-                                            </div>
-                                            <div class="form-group cs-id-editar">
-                                                <label>Nova Senha</label>
-                                                <input type="text" name="usuario" class="form-control"><span></span>
-                                            </div>
-                                            <div class="form-group cs-id-editar">
-                                                <label>Nova Senha</label>
-                                                <input type="text" name="usuario" class="form-control"><span></span>
-                                            </div>
-                                            <button type="button" data-action="cadastrar_usuario" class="btn btn-success cs-salvar">Alterar</button>
-                                            <button type="reset" data-action="limpar" class="btn btn-warning">Limpar</button>
+                                        <div class="panel-body">
+                                            <form action="" id="form_login" accept-charset="utf-8" method="post">
+                                                <div class="form-group">
+                                                    <label>Senha Atual</label>
+                                                    <input type="password" name="senha_atual" class="form-control">
+                                                </div>
+                                                <div class="form-group cs-id-editar">
+                                                    <label>Nova Senha</label>
+                                                    <input type="password" name="senha_nova" class="form-control"><span></span>
+                                                </div>
+                                                <div class="form-group cs-id-editar">
+                                                    <label>Repetir Nova Senha</label>
+                                                    <input type="password" name="senha_nova_repetir" class="form-control"><span></span>
+                                                </div>
+                                                <button type="button" class="btn btn-primary cs-alterar-senha">Alterar</button>
+                                                <button type="reset" class="btn btn-default">Limpar</button>
+                                            </form>
                                         </div>
                                     </div>
-                                </ul>
-                                <!-- /.dropdown-messages -->
+                                </div>
                             </li>
-                            <!-- /.dropdown -->
                             <li>
                                 <a class="cs-deslogar" href="#" title="Deslogar">
                                     <i class="ion ion-log-out ion-size-large pull-right"></i></i>
