@@ -262,13 +262,18 @@ switch (locale[4]) {
     case 'usuario':
         listar('usuario-funcionario', 1, 10);
         function cadastrar_usuario_funcionario() {
+            var email_usuario = $('input[name=email]').val();
             var nome_usuario = $('input[name=usuario_nome]').val();
             var usuario_usuario = $('input[name=usuario_usuario]').val();
+            var senha = $('input[name=senha]').val();
+            var repetirsenha = $('input[name=repetirsenha]').val();
             var ramal_usuario = $('input[name=usuario_telefone]').val();
             var sexo_usuario = $('select[name=usuario_sexo]').find(":selected").val();
             var permissao_usuario = $('select[name=usuario_permissao]').find(":selected").val();
-            if (nome_usuario === "" || usuario_usuario === "" || permissao_usuario === "" || sexo_usuario === "") {
+            if (nome_usuario === "" || usuario_usuario === "" || permissao_usuario === "" || sexo_usuario === "" || email_usuario === "" || senha === "" || repetirsenha === "") {
                 alert_open("danger", "Os campos com * são obrigatórios.");
+            } else if (senha !== repetirsenha) {
+                alert_open("danger", "Você deve digitar a mesma senha duas vezes.");
             } else {
                 $.ajax({
                     type: 'GET',
@@ -279,6 +284,8 @@ switch (locale[4]) {
                         nome_usuario_cadastrar: nome_usuario,
                         usuario_usuario_cadastrar: usuario_usuario,
                         sexo_usuario: sexo_usuario,
+                        email_usuario: email_usuario,
+                        senha: senha,
                         ramal_usuario_cadastrar: ramal_usuario,
                         permissao_usuario_cadastrar: permissao_usuario
                     },
@@ -299,12 +306,13 @@ switch (locale[4]) {
         }
         function editar_usuario_funcionario() {
             var usuario_usuario_editar = $('input[name=id-editar]').val();
+            var email_usuario = $('input[name=email]').val();
             var nome_usuario = $('input[name=usuario_nome]').val();
             var usuario_usuario = $('input[name=usuario_usuario]').val();
             var ramal_usuario = $('input[name=usuario_telefone]').val();
             var sexo_usuario = $('select[name=usuario_sexo]').find(":selected").val();
             var permissao_usuario = $('select[name=usuario_permissao]').find(":selected").val();
-            if (nome_usuario === "" || usuario_usuario === "" || permissao_usuario === "" || sexo_usuario === "") {
+            if (nome_usuario === "" || usuario_usuario === "" || permissao_usuario === "" || sexo_usuario === "" || email_usuario === "") {
                 alert_open("danger", "Os campos com * são obrigatórios.");
             } else {
                 $.ajax({
@@ -317,6 +325,7 @@ switch (locale[4]) {
                         action_id: usuario_usuario_editar, nome_usuario: nome_usuario, usuario_usuario: usuario_usuario,
                         sexo_usuario: sexo_usuario,
                         ramal_usuario: ramal_usuario,
+                        email_usuario: email_usuario,
                         permissao_usuario: permissao_usuario
                     },
                     success: function (retorno) {
@@ -837,6 +846,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             break;
                         case "editar_usuario":
                             editar_usuario_funcionario();
+                            $('div#senhas').show();
                             break;
                         default :
                             break;
@@ -932,9 +942,11 @@ function pre_editar(pagina, id) {
                 switch (pagina) {
                     case 'usuario-funcionario':
                         $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
+                        $('div#senhas').hide();
                         $('input[name=usuario_nome]').val(retorno[0].nome);
                         $('input[name=id-editar]').val(retorno[0].usuario);
                         $('input[name=usuario_usuario]').val(retorno[0].usuario);
+                        $('input[name=email]').val(retorno[0].email);
                         $('input[name=usuario_telefone]').val(retorno[0].ramal);
                         $('select[name=usuario_sexo]').val(retorno[0].sexo);
                         $('select[name=usuario_permissao]').val(retorno[0].permissao);
@@ -1066,7 +1078,6 @@ function modal_open(id, pagina, titulo) {
                 sexo["m"] = "Masculino";
                 if (pagina === "usuario-aluno" || pagina === "usuario-funcionario") {
                     var permissao_nome;
-                    var btn_reset_senha = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-reset-senha-info">Reiniciar Senha</button>';
 
                     var btn_alterar_num = '<button type="button" data-id="' + id + '" data-pagina="usuario-aluno" class="btn btn-primary cs-conf-alterar-num">Alterar Num</button>';
                     var btn_atribuir_num = '<button type="button" data-id="' + id + '" data-pagina="usuario-aluno" class="btn btn-primary cs-conf-alterar-num">Atribuir Num</button>';
@@ -1074,11 +1085,8 @@ function modal_open(id, pagina, titulo) {
                     var btn_desbloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-desbloquear">Desbloquear</button>';
                     var btn_bloquear = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-bloquear">Bloquear</button>';
                     switch (retorno[0].permissao) {
-                        case '0':
-                            permissao_nome = 'Total';
-                            break;
                         case '1':
-                            permissao_nome = 'Parcial';
+                            permissao_nome = 'Total';
                             break;
                         case '2':
                             permissao_nome = 'Visualização Relatórios/Gráficos';
@@ -1092,16 +1100,18 @@ function modal_open(id, pagina, titulo) {
                             html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                             html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
                             html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                            html_body += '<li><strong>Email:</strong>' + retorno[0].email + '</li>';
                             html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
                             html_body += '<li><strong>Telefone/Contato:</strong>' + retorno[0].ramal + '</li>';
                             html_body += '<li><strong>Permissão:</strong>' + permissao_nome + '</li>';
                             html_body += '</ul>';
-                            html_footer = btn_reset_senha + btn_editar + btn_excluir;
+                            html_footer = btn_editar + btn_excluir;
                             break;
                         case 'usuario-aluno':
                             html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                             html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
                             html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                            html_body += '<li><strong>Email:</strong>' + retorno[0].email + '</li>';
                             html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
                             if (retorno[0].num === "") {
                                 html_body += '<li class="gray"><strong>Número:</strong><span id="cs-num-aluno">Aluno sem número</span></li>';
@@ -1123,7 +1133,7 @@ function modal_open(id, pagina, titulo) {
                                 }
                                 html_body += '</tbody></table></div>';
                             }
-                            html_footer = btn_reset_senha;
+                            html_footer = "";
                             if (retorno[0].num === "") {
                                 html_footer += btn_atribuir_num;
                             } else {
@@ -1213,6 +1223,7 @@ function modal_open(id, pagina, titulo) {
                     html_body = '<ul class="list-unstyled" id="cs-list-modal">';
                     html_body += '<li><strong>Nome:</strong>' + retorno[0].nome + '</li>';
                     html_body += '<li><strong>Usuário:</strong>' + retorno[0].usuario + '</li>';
+                    html_body += '<li><strong>Email:</strong>' + retorno[0].email + '</li>';
                     html_body += '<li><strong>Sexo:</strong>' + sexo[retorno[0].sexo] + '</li>';
                     if (retorno[0].num === "") {
                         html_body += '<li class="gray"><strong>Número:</strong><span id="cs-num-aluno">Aluno sem número</span></li>';
@@ -1745,36 +1756,6 @@ function modal_open(id, pagina, titulo) {
                     pre_editar($(this).attr('data-pagina'), $(this).attr('data-id'));
                     $('#cs-modal').modal('hide');
                 });
-                $('#cs-modal .cs-reset-senha-info').click(function () {
-                    titulo = "Deseja realmente resetar a senha do usuario selecionado?";
-                    html_body = "Não será possível recuperar a senha anterior.";
-                    html_footer = '<button type="button" data-id="' + id + '" class="btn btn-primary cs-reset-senha">Resetar</button>';
-                    $('.modal-title').html(titulo);
-                    $('.modal-body').html(html_body);
-                    $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
-                    $('#cs-modal .cs-reset-senha').click(function () {
-                        $.ajax({
-                            type: 'GET',
-                            url: 'action/action.php',
-                            dataType: 'json',
-                            data: {
-                                action_pagina: 'usuario',
-                                action: "reset_senha",
-                                action_id: $(this).attr('data-id')
-                            },
-                            success: function (retorno) {
-                                if (retorno.erro === false) {
-                                    alert_open("success", "Senha resetada com sucesso.");
-                                } else {
-                                    alert_open("danger", retorno.msg_erro);
-                                }
-                            },
-                            error: function () {
-                                alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
-                            }});
-                        $('#cs-modal').modal('hide');
-                    });
-                });
                 $('#cs-modal .cs-conf-alterar-num').click(function () {
                     $.ajax({
                         type: 'GET',
@@ -1945,6 +1926,9 @@ $(document).ready(function () {
     $('button.cs-cancelar').click(function () {
         $('span#cs-action').html("Cadastrar");
         limpar_form_cadastro();
+        if (pagina_url === "usuario") {
+            $('div#senhas').show();
+        }
     });
     $('button.cs-logar').click(function () {
         logar();

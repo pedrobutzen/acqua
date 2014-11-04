@@ -65,7 +65,6 @@ $menu_page_active = "lancamento";
                         <button type="button" data-action="cadastrar_lancamento" class="btn btn-primary cs-salvar" style="float: right;">Enviar</button>
                         <?php
                     }
-                    echo '<script><script>';
                 } else {
                     ?>
                     <div class="well well-lg">Usuário não pode enviar peças para lavanderia pois está bloqueado.</div>

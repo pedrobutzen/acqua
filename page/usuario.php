@@ -22,6 +22,20 @@ $menu_page_active = "usuario";
                                 <label>Usuário*</label>
                                 <input type="text" name="usuario_usuario" class="form-control">
                             </div>
+                            <div id="senhas">
+                                 <div class="form-group">
+                                    <label>Senha*</label>
+                                    <input type="password" name="senha" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Repetir Senha*</label>
+                                    <input type="password" name="repetirsenha" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Email*</label>
+                                <input type="text" name="email" class="form-control">
+                            </div>
                             <div class="form-group col-lg-6">
                                 <label>Sexo*</label>
                                 <select class="form-control" name="usuario_sexo">
@@ -42,7 +56,7 @@ $menu_page_active = "usuario";
                                     <option value="2">Visualização Relatórios/Gráficos</option>
                                 </select>
                             </div>
-                            <div class="well-sm well">A senha padrão criada é <strong>unasp</strong>, no primeiro acesso será solicitada sua alteração.</div>
+
                             <button type="button" data-action="editar_usuario" class="btn btn-primary cs-editar">Editar</button>
                             <button type="button" data-action="cadastrar_usuario" class="btn btn-primary cs-salvar">Salvar</button>
                             <button type="reset" data-action="limpar" class="btn btn-default">Limpar</button>

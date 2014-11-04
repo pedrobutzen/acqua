@@ -1106,6 +1106,7 @@ if (isset($_SESSION['usuario'])) {
                                 'sexo' => utf8_encode($row["sexo"]),
                                 'ramal' => utf8_encode($row["ramal"]),
                                 'quarto' => utf8_encode($row["quarto"]),
+                                'email' => utf8_encode($row["email"]),
                                 'num' => utf8_encode($row["num"]),
                                 'senha' => utf8_encode($row["senha"]),
                                 'permissao' => utf8_encode($row["permissao"]),
@@ -1118,6 +1119,7 @@ if (isset($_SESSION['usuario'])) {
                                 'usuario' => utf8_encode($row["usuario"]),
                                 'sexo' => utf8_encode($row["sexo"]),
                                 'ramal' => utf8_encode($row["ramal"]),
+                                'email' => utf8_encode($row["email"]),
                                 'quarto' => utf8_encode($row["quarto"]),
                                 'num' => utf8_encode($row["num"]),
                                 'senha' => utf8_encode($row["senha"]),
@@ -1136,19 +1138,22 @@ if (isset($_SESSION['usuario'])) {
         case "usuario-funcionario":
             switch ($action) {
                 case 'cadastrar':
+                    $email_usuario = utf8_decode($_GET['email_usuario']);
                     $nome_usuario = utf8_decode($_GET['nome_usuario_cadastrar']);
                     $usuario_usuario = utf8_decode($_GET['usuario_usuario_cadastrar']);
                     $sexo_usuario = utf8_decode($_GET['sexo_usuario']);
                     $ramal_usuario = utf8_decode($_GET['ramal_usuario_cadastrar']);
                     $permissao_usuario = utf8_decode($_GET['permissao_usuario_cadastrar']);
+                    $senha_usuario = utf8_decode($_GET['senha']);
                     $sql = mysqli_query($conect, "SELECT nome FROM usuario WHERE usuario='$usuario_usuario'");
                     if (mysqli_num_rows($sql) == "0") {
-                        $sql = mysqli_query($conect, "INSERT INTO usuario (usuario, nome, senha, quarto, ramal, permissao) VALUES ('" . $usuario_usuario . "', '" . $nome_usuario . "', 'unasp', NULL, '" . $ramal_usuario . "', '" . $permissao_usuario . "');");
+                        $sql = mysqli_query($conect, "INSERT INTO usuario (usuario, nome, senha, quarto, ramal, permissao, email, sexo) VALUES ('" . $usuario_usuario . "', '" . $nome_usuario . "', '$senha_usuario', NULL, '" . $ramal_usuario . "', '" . $permissao_usuario . "', '" . $email_usuario . "', '" . $sexo_usuario . "');");
                     } else {
                         $result = array('erro' => true, 'msg_erro' => 'Usuário já existe.');
                     }
                     break;
                 case 'editar':
+                    $email_usuario = utf8_decode($_GET['email_usuario']);
                     $nome_usuario = utf8_decode($_GET['nome_usuario']);
                     $usuario_usuario = utf8_decode($_GET['usuario_usuario']);
                     $ramal_usuario = utf8_decode($_GET['ramal_usuario']);
@@ -1158,7 +1163,7 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($sql) == "0") {
                         $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
                     } else {
-                        $sql = mysqli_query($conect, "UPDATE usuario SET usuario='" . $usuario_usuario . "', nome='" . $nome_usuario . "', sexo='" . $sexo_usuario . "', ramal='" . $ramal_usuario . "', permissao='" . $permissao_usuario . "' WHERE usuario='" . $action_id . "';");
+                        $sql = mysqli_query($conect, "UPDATE usuario SET email='" . $email_usuario . "', usuario='" . $usuario_usuario . "', nome='" . $nome_usuario . "', sexo='" . $sexo_usuario . "', ramal='" . $ramal_usuario . "', permissao='" . $permissao_usuario . "' WHERE usuario='" . $action_id . "';");
                     }
                     break;
                 case 'listar':
@@ -1166,9 +1171,9 @@ if (isset($_SESSION['usuario'])) {
                     $maximo = utf8_decode($_GET['listar_qtd_itens']);
                     $inicio = ($pag * $maximo) - $maximo;
                     if ($action_id == "") {
-                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('0', '1', '2')");
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('1', '2')");
                     } else {
-                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('0', '1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%')");
+                        $qtd_geral = mysqli_query($conect, "SELECT usuario FROM usuario WHERE permissao in ('1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%')");
                     }
                     $qtd_geral_idioma = mysqli_num_rows($qtd_geral);
                     $qtd_array = array(
@@ -1176,9 +1181,9 @@ if (isset($_SESSION['usuario'])) {
                     );
                     array_push($result, $qtd_array);
                     if ($action_id == "") {
-                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('0', '1', '2') ORDER BY nome LIMIT $inicio, $maximo");
+                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('1', '2') ORDER BY nome LIMIT $inicio, $maximo");
                     } else {
-                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('0', '1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%') ORDER BY nome LIMIT $inicio, $maximo");
+                        $resultados = mysqli_query($conect, "SELECT * FROM usuario WHERE permissao in ('1', '2') AND (usuario LIKE '%$action_id%' OR nome LIKE '%$action_id%' OR quarto LIKE '%Pe%' OR ramal LIKE '%$action_id%' OR num LIKE '%$action_id%') ORDER BY nome LIMIT $inicio, $maximo");
                     }
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhum usuário encontrado.');
@@ -1187,6 +1192,7 @@ if (isset($_SESSION['usuario'])) {
                             $dados = array(
                                 'nome' => utf8_encode($row["nome"]),
                                 'usuario' => utf8_encode($row["usuario"]),
+                                'email' => utf8_encode($row["email"]),
                                 'ramal' => utf8_encode($row["ramal"]),
                                 'permissao' => utf8_encode($row["permissao"]),
                             );
@@ -1205,6 +1211,7 @@ if (isset($_SESSION['usuario'])) {
                                 'nome' => utf8_encode($row["nome"]),
                                 'usuario' => utf8_encode($row["usuario"]),
                                 'sexo' => utf8_encode($row["sexo"]),
+                                'email' => utf8_encode($row["email"]),
                                 'ramal' => utf8_encode($row["ramal"]),
                                 'permissao' => utf8_encode($row["permissao"]),
                             );
@@ -1257,6 +1264,7 @@ if (isset($_SESSION['usuario'])) {
                                     'ramal' => utf8_encode($row["ramal"]),
                                     'quarto' => utf8_encode($row["quarto"]),
                                     'senha' => utf8_encode($row["senha"]),
+                                    'email' => utf8_encode($row["email"]),
                                     'num' => utf8_encode($row["num"]),
                                     'bloqueado' => utf8_encode($row["bloqueado"]),
                                 );
@@ -1306,6 +1314,7 @@ if (isset($_SESSION['usuario'])) {
                                 'sexo' => utf8_encode($row["sexo"]),
                                 'ramal' => utf8_encode($row["ramal"]),
                                 'quarto' => utf8_encode($row["quarto"]),
+                                'email' => utf8_encode($row["email"]),
                                 'num' => utf8_encode($row["num"]),
                                 'senha' => utf8_encode($row["senha"]),
                                 'permissao' => utf8_encode($row["permissao"]),
@@ -1319,6 +1328,7 @@ if (isset($_SESSION['usuario'])) {
                                 'sexo' => utf8_encode($row["sexo"]),
                                 'ramal' => utf8_encode($row["ramal"]),
                                 'quarto' => utf8_encode($row["quarto"]),
+                                'email' => utf8_encode($row["email"]),
                                 'num' => utf8_encode($row["num"]),
                                 'senha' => utf8_encode($row["senha"]),
                                 'permissao' => utf8_encode($row["permissao"]),

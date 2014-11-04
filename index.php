@@ -55,6 +55,10 @@ if (isset($_SESSION['usuario'])) {
 
     include 'layout/layout.php';
 } else {
-    include 'login.php';
+    if (@$_GET['page'] == 'esqueciasenha') {
+        include 'esqueciasenha.php';
+    } else {
+        include 'login.php';
+    }
 }
 ?>
