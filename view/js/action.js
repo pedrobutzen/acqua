@@ -537,8 +537,6 @@ function editar_livro() {
 function log(texto) {
     console.log(texto);
 }
-
-// ------- USUÁRIO -------
 function logar() {
     var usuario_logar = $('input[name=usuario]').val();
     var senha_usuario_logar = $('input[name=senha]').val();
@@ -592,7 +590,6 @@ function deslogar() {
     });
 }
 
-// ------- GERAL -------
 function carregar_select(action_pagina) {
     $.ajax({
         type: 'GET',
@@ -1969,6 +1966,32 @@ $(document).ready(function () {
                     if (retorno.erro === false) {
                         $('.navbar-top-links input').val('');
                         alert_open("success", "Senha alterada com sucesso.");
+                    } else {
+                        alert_open("danger", retorno.msg_erro);
+                    }
+                },
+                error: function () {
+                    alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
+                }
+            });
+        }
+    });
+    $('button.cs-esqueciasenha').click(function () {
+        log("asklkldaslk");
+        var usuario = $('input[name=usuario]').val();
+        if (usuario === "") {
+            alert_open("danger", "Digite o usuário.");
+        } else {
+            $.ajax({
+                type: 'GET',
+                url: 'action/esqueciasenha.php',
+                dataType: 'json',
+                data: {
+                    usuario: usuario
+                },
+                success: function (retorno) {
+                    if (retorno.erro === false) {
+                        alert_open("success", "Em instantes você receberá uma nova senha no e-mail " + retorno[0].email);
                     } else {
                         alert_open("danger", retorno.msg_erro);
                     }

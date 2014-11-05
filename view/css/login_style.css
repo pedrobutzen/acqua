@@ -18,5 +18,12 @@
     z-index: 99999;
 }
 .container{
- margin-top: 110px;
+    margin-top: 110px;
+}
+a, a:hover, a:visited{
+    color: #77A3C8;
+    text-decoration: none;
+}
+.info-login{
+    color: #77A3C8;
 }

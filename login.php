@@ -26,10 +26,11 @@
                     <div class="form-group">
                         <input type="text" name="usuario" class="form-control" placeholder="Usuário">
                     </div>
-                    <div class="form-group text-right">
+                    <div class="form-group">
                         <input type="password" name="senha" class="form-control" placeholder="Senha">
                     </div>
                     <button type="button" class="btn btn-block btn-outline cs-logar btn-danger">Entrar</button>
+                    <a href="esqueciasenha" class="pull-right">Esqueci a senha</a>
                 </div>
             </div>
         </div>
