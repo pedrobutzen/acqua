@@ -35,7 +35,7 @@ switch (locale[4]) {
                     success: function (retorno) {
                         if (retorno.erro === false) {
                             listar('peca', 1, 10);
-                            alert_open("success", "Cadastrado com sucesso.");
+                            alert_open("success", "Cadastrada com sucesso.");
                             $('#cs-form input').val('');
                             $('#cs-form select').val('');
                             $('div.cs-outro-form').hide();
@@ -994,7 +994,7 @@ function excluir(pagina, id) {
             if (retorno.erro === "success") {
                 alert_open("success", retorno.msg_status);
             } else if (retorno.erro === false) {
-                alert_open("success", "Excluido com sucesso.");
+                alert_open("success", "Excluído com sucesso.");
             } else {
                 alert_open("danger", retorno.msg_erro);
             }
