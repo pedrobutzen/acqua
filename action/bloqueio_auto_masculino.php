@@ -5,10 +5,11 @@ include_once '../conexao/conexao.php';
 
 $resultados = mysqli_query($conect, "SELECT u.usuario FROM lancamento as l JOIN(usuario as u) ON(u.usuario=l.usuario) WHERE "
         . "ISNULL(l.data_devolucao) AND !ISNULL(l.data_recebimento) AND u.sexo='m'");
-if (mysqli_num_rows($resultados) > 0) {
+if (mysqli_num_rows($resultados) == 1) {
     while ($row = mysqli_fetch_array($resultados)) {
         $usuario_bloquear = $row['usuario'];
-        $resultados_desbloqueio = mysqli_query($conect, "SELECT * FROM bloqueio WHERE usuario='$usuario_bloquear' AND ISNULL(data_fim)");
+        $resultados_desbloqueio = mysqli_query($conect, "SELECT * FROM bloqueio WHERE usuario_bloqueio='sistema' "
+                . "usuario='$usuario_bloquear' AND ISNULL(data_fim)");
         if (mysqli_num_rows($resultados_desbloqueio) == 0) {
             mysqli_query($conect, "INSERT INTO bloqueio (usuario, usuario_bloqueio) VALUES ('$usuario_bloquear', 'sistema');");
         }
