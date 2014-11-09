@@ -408,7 +408,7 @@ if (isset($_SESSION['usuario'])) {
                     }
                     break;
                 case 'montar':
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.usuario, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
+                    $resultados = mysqli_query($conect, "SELECT peca.usuario, peca.idpeca, peca.usuario, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     } else {
@@ -431,6 +431,7 @@ if (isset($_SESSION['usuario'])) {
                             }
                         }
                         $dados = array(
+                            'usuario' => utf8_encode($row["usuario"]),
                             'idpeca' => utf8_encode($row["idpeca"]),
                             'descricaopeca' => utf8_encode($row["descricao"]),
                             'usuario' => utf8_encode($row["usuario"]),
@@ -470,10 +471,15 @@ if (isset($_SESSION['usuario'])) {
                 case 'editar':
                     $tipo = $_GET['tipo'];
                     $sql = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE idtipo_ocorrencia='$action_id'");
-                    if (mysqli_num_rows($sql) == 0) {
-                        $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência não encontrada.');
+                    if (mysqli_num_rows($sql) == 1) {
+                        $sql = mysqli_query($conect, "SELECT * FROM tipo_ocorrencia WHERE tipo='$tipo'");
+                        if (mysqli_num_rows($sql) == 0) {
+                            $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência não encontrada.');
+                        } else {
+                            $sql_insert = mysqli_query($conect, "UPDATE tipo_ocorrencia SET tipo='$tipo' WHERE idtipo_ocorrencia='$action_id';");
+                        }
                     } else {
-                        $sql_insert = mysqli_query($conect, "UPDATE tipo_ocorrencia SET tipo='$tipo' WHERE idtipo_ocorrencia='$action_id';");
+                        $result = array('erro' => true, 'msg_erro' => 'Tipo de ocorrência não encontrado.');
                     }
                     break;
                 case 'excluir':
@@ -626,7 +632,7 @@ if (isset($_SESSION['usuario'])) {
                     }
                     break;
                 case 'montar':
-                    $resultados = mysqli_query($conect, "SELECT peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND idpeca='$action_id'");
+                    $resultados = mysqli_query($conect, "SELECT peca.usuario, peca.idpeca, peca.descricao, peca.marca, peca.cor, peca.tamanho, tipo.nome as nometipo, tipo.idtipo FROM peca JOIN(tipo) ON(peca.idtipo = tipo.idtipo) WHERE peca.usuario='$usuario_logado' AND idpeca='$action_id'");
                     if (mysqli_num_rows($resultados) == 0) {
                         $result = array('erro' => true, 'msg_erro' => 'Nenhuma peça encontrada.');
                     } else {
@@ -647,6 +653,7 @@ if (isset($_SESSION['usuario'])) {
                             }
                         }
                         $dados = array(
+                            'usuario' => utf8_encode($row["usuario"]),
                             'idpeca' => utf8_encode($row["idpeca"]),
                             'descricaopeca' => utf8_encode($row["descricao"]),
                             'marca' => utf8_encode($row["marca"]),
@@ -1023,14 +1030,14 @@ if (isset($_SESSION['usuario'])) {
                     break;
                 case 'confirmarsaida':
                     $usuario_entrada = $_SESSION['usuarioentrada']['usuario'];
-                    $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
 
+                    $sql_select_lancamento = mysqli_query($conect, "SELECT idlancamento FROM lancamento WHERE usuario='$usuario_entrada' AND !ISNULL(data_recebimento) AND ISNULL(data_devolucao);");
                     if (mysqli_num_rows($sql_select_lancamento) == 1) {
                         $row = mysqli_fetch_array($sql_select_lancamento);
                         $idlancamento = $row['idlancamento'];
                         mysqli_query($conect, "UPDATE lancamento SET data_devolucao=NOW(), usuario_devolucao='$usuario_logado' WHERE idlancamento='$idlancamento';");
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontrado.');
+                        $result = array('erro' => true, 'msg_erro' => 'Lançamento não encontradoss.');
                     }
                     break;
                 case 'logarusuario':
@@ -1062,7 +1069,7 @@ if (isset($_SESSION['usuario'])) {
                     break;
             }
             break;
-        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariogerenciarocorrencia" || $action_pagina == "usuariocadastrarocorrencia"):
+        case ($action_pagina == "usuarioentradapeca" || $action_pagina == "usuariosaidapeca" || $action_pagina == "usuariogerenciarocorrencia" || $action_pagina == "usuariocadastrarocorrencia" || $action_pagina == "usuariovisualizarlancamento"):
             switch ($action) {
                 case 'montar':
                     $resultados_usuario = mysqli_query($conect, "SELECT * FROM usuario WHERE usuario='$action_id' OR num='$action_id'");
@@ -1224,7 +1231,7 @@ if (isset($_SESSION['usuario'])) {
                     if (mysqli_num_rows($sql) == "1") {
                         $sql = mysqli_query($conect, "DELETE FROM usuario WHERE usuario='$action_id';");
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Usuário não encontrado.');
+                        $result = array('erro' => true, 'msg_erro' => 'Usuário funcionário não encontrado.');
                     }
                     break;
                 default:
@@ -1397,7 +1404,7 @@ if (isset($_SESSION['usuario'])) {
                         unset($_SESSION['usuario']);
                         $result = array('erro' => false);
                     } else {
-                        $result = array('erro' => true, 'msg_erro' => 'Não existe um usuário logado.');
+                        $result = array('erro' => true, 'msg_erro' => 'Não existe um usuário logado');
                     }
                     break;
                 default:

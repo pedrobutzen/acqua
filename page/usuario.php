@@ -53,7 +53,7 @@ $menu_page_active = "usuario";
                                 <select class="form-control" name="usuario_permissao">
                                     <option value="">Selecione</option>
                                     <option value="1">Total</option>
-                                    <option value="2">Visualização Relatórios/Gráficos</option>
+                                    <option value="2">Visualização Relatórios</option>
                                 </select>
                             </div>
 

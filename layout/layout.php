@@ -95,7 +95,7 @@ include_once 'conexao/conexao.php';
                                         <li><a href = "<?php echo $caminho ?>cadastrarocorrencia">Cadastrar Ocorrência</a></li>
                                         <li class = "divider"></li>
                                         <li><a href = "<?php echo $caminho ?>gerenciarocorrencia">Peças com Ocorrência</a></li>
-                                        <li><a href = "<?php echo $caminho ?>tipoocorrencia">Cadastrar Tipo de Ocorrência</a></li>
+                                        <li><a href = "<?php echo $caminho ?>tipoocorrencia">Gerenciar Tipo de Ocorrência</a></li>
                                     </ul>
                                 </li>
                                 <li id = "lancamento" class = "dropdown">

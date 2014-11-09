@@ -79,7 +79,7 @@ div.cs-navbar .active{
     margin-top: 5%;
 }
 .cs-alert{
-    width: 300px;
+    max-width: 330px;
     bottom: 30px;
     right: 50px;
     position: fixed;

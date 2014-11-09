@@ -12,6 +12,7 @@
     margin-top: 20px;
 }
 .cs-alert{
+    max-width: 330px;
     bottom: 30px;
     right: 50px;
     position: absolute;

@@ -80,6 +80,7 @@ switch (locale[4]) {
                         if (retorno.erro === false) {
                             listar('peca', 1, 10);
                             alert_open("success", "Peça editada com sucesso.");
+                            $('span#cs-action').html("Cadastrar");
                             limpar_form_cadastro();
                             return true;
                         } else {
@@ -150,6 +151,7 @@ switch (locale[4]) {
                         if (retorno.erro === false) {
                             listar('tipoocorrencia', 1, 10);
                             alert_open("success", "Editado com sucesso.");
+                            $('span#cs-action').html("Cadastrar");
                             $('#cs-form input').val('');
                             $('#cs-form select').val('');
                         } else {
@@ -331,6 +333,7 @@ switch (locale[4]) {
                     success: function (retorno) {
                         if (retorno.erro === false) {
                             listar('usuario-funcionario', 1, 10);
+                            $('span#cs-action').html("Cadastrar");
                             alert_open("success", "Usuário editado com sucesso.");
                             limpar_form_cadastro();
                         } else {
@@ -409,7 +412,7 @@ switch (locale[4]) {
                     },
                     success: function (retorno) {
                         if (retorno.erro === false) {
-                            alert_open("success", "Atribuido com sucesso.");
+                            alert_open("success", "Atribuído com sucesso.");
                             $('#cs-form select').val('');
                         } else {
                             alert_open("danger", retorno.msg_erro);
@@ -451,89 +454,6 @@ switch (locale[4]) {
     default:
         break;
 }
-// ****************** IDIOMA
-
-// ****************** LIVRO 
-function cadastrar_livro() {
-    var titulo = $('input[name=titulo]').val();
-    var sigla = $('input[name=sigla]').val();
-    //var capa = $("input[name=img_capa]").val();
-    //var id_idioma = $("input[name=id_idioma_livro]").val();
-
-    if (titulo === "" || sigla === "") {
-        $('div#cs-alert-success').hide();
-        $('span#cs-message-danger').text("Todos campos são obrigatórios.");
-        $('div#cs-alert-danger').show();
-        return false;
-    } else {
-        $.ajax({
-            type: 'GET',
-            url: 'action/action.php',
-            dataType: 'json',
-            data: {
-                action_pagina: "livro",
-                action: "cadastrar",
-                titulo_livro_cadastrar: titulo,
-                sigla_livro_cadastrar: sigla,
-                capa_livro_cadastrar: capa,
-                id_idioma_livro_cadastrar: id_idioma
-            },
-            success: function (retorno) {
-                if (retorno.erro === false) {
-                    listar('livro', 1, 10);
-                    $('span#cs-message-success').text("Cadastrado com sucesso.");
-                    $('div#cs-alert-danger').hide();
-                    $('div#cs-alert-success').show();
-                    $('#cs-form input').val('');
-                } else {
-                    $('div#cs-alert-success').hide();
-                    $('span#cs-message-danger').text(retorno.msg_erro);
-                    $('div#cs-alert-danger').show();
-                }
-            },
-            error: function () {
-                alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
-            }
-        });
-    }
-}
-function editar_livro() {
-    var titulo = $('input[name=titulo]').val();
-    var sigla = $('input[name=sigla]').val();
-    if (titulo === "" || sigla === "") {
-        alert_open("danger", "Os campos com * são obrigatórios.");
-    } else {
-        $.ajax({
-            type: 'GET',
-            url: 'action/action.php',
-            dataType: 'json',
-            data: {
-                action_pagina: "livro",
-                action: "editar",
-                id_livro_editar: $('input[name=id_livro]').val(),
-                titulo_livro_editar: titulo,
-                sigla_livro_editar: sigla
-            },
-            success: function (retorno) {
-                if (retorno.erro === false) {
-                    listar('livro', 1, 10);
-                    $('span#cs-message-success').text("Editado com sucesso.");
-                    $('div#cs-alert-danger').hide();
-                    $('div#cs-alert-success').show();
-                    limpar_form_cadastro();
-                } else {
-                    $('div#cs-alert-success').hide();
-                    $('span#cs-message-danger').text(retorno.msg_erro);
-                    $('div#cs-alert-danger').show();
-                }
-            },
-            error: function () {
-                alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
-            }
-        });
-    }
-}
-
 function log(texto) {
     console.log(texto);
 }
@@ -763,7 +683,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                         break;
                     case "visualizarlancamentousuario":
                         for (var j = 1; j < a - 1; j++) {
-                            html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
+                            html_tags += '<tr data-id="' + retorno[j].idlancamento + '" data-pagina="visualizarlancamentousuario" title="Clique para visualizar peças do lançamento"><td>' + retorno[j].data_criacao + '</td><td>' + retorno[j].usuario + '</td><td>' + retorno[j].data_recebimento + '</td><td>' + retorno[j].usuario_recebimento + '</td><td>' + retorno[j].data_devolucao + '</td><td>' + retorno[j].usuario_devolucao + '</td></tr>';
                         }
                         break;
                     case "tipoocorrencia":
@@ -788,7 +708,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             }
                             html_tags += '<tr class="' + class_tr + '" data-id="' + retorno[j].usuario + '" data-pagina="usuario-funcionario" title="Clique para detalhar usuário"><td>' + retorno[j].nome + '</td><td>' + retorno[j].usuario + '</td><td>' + retorno[j].ramal + '</td></tr>';
                         }
-                        $('div.cs-legenda').html('<span class="label-danger">Total</span> - <span class="label-warning">Visualização Relatórios/Gráficos</span>');
+                        $('div.cs-legenda').html('<span class="label-danger">Total</span> - <span class="label-warning">Visualização Relatórios</span>');
                         break;
                     case "usuario-aluno":
                         $('input[name=pesquisa]').val(action_id_local);
@@ -868,13 +788,16 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             tr_clicada = $(this);
                             titulo_modal = 'Detalhes de Peça';
                             break;
+                        case 'cadastrarocorrencia':
+                            titulo_modal = 'Detalhes de Peça com Ocorrência';
+                            break;
                         case 'ocorrencia':
                             titulo_modal = 'Detalhes de Peça com Ocorrência';
                             break;
                         case 'tipoocorrencia':
                             titulo_modal = 'Detalhes do Tipo de Ocorrência';
                             break;
-                        case 'gerenciarcorrencia':
+                        case 'gerenciarocorrencia':
                             titulo_modal = 'Detalhes de Peça com Ocorrência';
                             break;
                         case 'lancamentospassados':
@@ -1086,7 +1009,7 @@ function modal_open(id, pagina, titulo) {
                             permissao_nome = 'Total';
                             break;
                         case '2':
-                            permissao_nome = 'Visualização Relatórios/Gráficos';
+                            permissao_nome = 'Visualização Relatórios';
                             break;
                         default :
                             permissao_nome = 'Permissão não identificada';
@@ -1732,7 +1655,7 @@ function modal_open(id, pagina, titulo) {
                             break;
                         case "tipoocorrencia":
                             titulo = "Deseja realmente excluir o tipo de ocorrência selecionado?";
-                            html_body = "Não será possível recuperá-lo.";
+                            html_body = "Todas as ocorrências que possuem o tipo excluído também serão excluidas, e não será possível recuperá-las.";
                             html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-excluir">Excluir</button>';
                             break;
                         default :
@@ -1977,7 +1900,6 @@ $(document).ready(function () {
         }
     });
     $('button.cs-esqueciasenha').click(function () {
-        log("asklkldaslk");
         var usuario = $('input[name=usuario]').val();
         if (usuario === "") {
             alert_open("danger", "Digite o usuário.");

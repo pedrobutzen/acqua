@@ -4,7 +4,7 @@ $menu_page_active = "usuario";
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="col-lg-12">
-            <h2>Atribuir automaticamente número <small>Atribua número aos usuários automaticamente.</small></h2>
+            <h2>Atribuir Número Automaticamente <small>Atribua número aos alunos automaticamente.</small></h2>
             <hr>
             <div class="row-fluid">
                 <form role="form" class="col-lg-3 cs-p-botton25">

@@ -4,7 +4,7 @@ $menu_page_active = "lancamento";
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="col-lg-12">
-            <h2>Visualizar Lançamentos <small>Visualizar lançamentos ativos(dentro da lavanderia) e devolvidos(devolvidos pro aluno).</small></h2>
+            <h2>Visualizar Lançamento <small>Visualizar lançamentos ativos(dentro da lavanderia) e devolvidos(devolvidos para o aluno).</small></h2>
             <hr>
             <div class="row-fluid">
                 <div class="col-lg-3 cs-p-botton25">

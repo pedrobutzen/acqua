@@ -4,7 +4,7 @@ $menu_page_active = "peca";
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="col-lg-12">
-            <h2>Peça <small>Cadastrar, editar e excluir peças</small></h2>
+            <h2>Gerenciar Peça <small>Cadastrar, editar e excluir peças</small></h2>
             <hr>
             <div class="row-fluid">
                 <div class="col-lg-3 cs-p-botton25">
