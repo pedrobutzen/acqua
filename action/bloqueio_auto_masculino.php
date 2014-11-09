@@ -3,7 +3,8 @@
 header('Content-type: text/html; charset=UTF-8');
 include_once '../conexao/conexao.php';
 
-$resultados = mysqli_query($conect, "SELECT u.usuario FROM lancamento as l JOIN(usuario as u) ON(u.usuario=l.usuario) WHERE ISNULL(l.data_devolucao) AND !ISNULL(l.data_recebimento) AND u.sexo='m'");
+$resultados = mysqli_query($conect, "SELECT u.usuario FROM lancamento as l JOIN(usuario as u) ON(u.usuario=l.usuario) WHERE "
+        . "ISNULL(l.data_devolucao) AND !ISNULL(l.data_recebimento) AND u.sexo='m'");
 if (mysqli_num_rows($resultados) > 0) {
     while ($row = mysqli_fetch_array($resultados)) {
         $usuario_bloquear = $row['usuario'];
