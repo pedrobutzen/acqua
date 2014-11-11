@@ -7,6 +7,7 @@ var tr_clicada = "";
 switch (locale[4]) {
     case 'peca':
         listar('peca', 1, 10);
+        carregar_select('peca');
         function cadastrar_peca() {
             var descricao = $('input[name=descricao]').val();
             var marca = $('input[name=marca]').val();
