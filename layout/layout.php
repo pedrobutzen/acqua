@@ -101,11 +101,11 @@ include_once 'conexao/conexao.php';
                                 <li id = "lancamento" class = "dropdown">
                                     <a href = "" class = "dropdown-toggle" data-toggle = "dropdown">Lançamento <span class = "caret"></a>
                                     <ul class = "dropdown-menu" role = "menu">
-                                        <li><a href = "<?php echo $caminho ?>visualizarlancamento">Visualizar Lançamento</a></li>
-                                        <li class = "divider"></li>
                                         <li><a href = "<?php echo $caminho ?>entradapeca">Entrada de Peça</a></li>
                                         <li class = "divider"></li>
                                         <li><a href = "<?php echo $caminho ?>saidapeca">Saída de Peça</a></li>
+                                        <li class = "divider"></li>
+                                        <li><a href = "<?php echo $caminho ?>visualizarlancamento">Visualizar Lançamento</a></li>
                                     </ul>
                                 </li>
                                 <li id = "usuario" class = "dropdown">

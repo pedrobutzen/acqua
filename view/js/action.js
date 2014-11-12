@@ -80,6 +80,7 @@ switch (locale[4]) {
                     success: function (retorno) {
                         if (retorno.erro === false) {
                             listar('peca', 1, 10);
+                            carregar_select('peca');
                             alert_open("success", "Peça editada com sucesso.");
                             $('span#cs-action').html("Cadastrar");
                             limpar_form_cadastro();
@@ -790,7 +791,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'cadastrarocorrencia':
-                            titulo_modal = 'Detalhes de Peça com Ocorrência';
+                            titulo_modal = 'Detalhes de Peça';
                             break;
                         case 'ocorrencia':
                             titulo_modal = 'Detalhes de Peça com Ocorrência';
@@ -873,7 +874,6 @@ function pre_editar(pagina, id) {
                         $('select[name=usuario_permissao]').val(retorno[0].permissao);
                         break;
                     case 'peca':
-                        carregar_select(pagina);
                         $('div.cs-id-editar').html('<input type="text" name="id-editar" class="form-control" style="display:none;">');
                         $('input[name=descricao]').val(retorno[0].descricaopeca);
                         $('input[name=id-editar]').val(retorno[0].idpeca);
@@ -1424,7 +1424,6 @@ function modal_open(id, pagina, titulo) {
                                                         titulo = "Deseja realmente salvar as alterações?";
                                                         html_body = "As informações anteriores serão perdidas.";
                                                         html_footer = '<button type="button" data-id="' + id + '" data-pagina="' + pagina + '" class="btn btn-primary cs-editar-peca-lancamento">Editar</button>';
-                                                        log(id + '--' + pagina)
                                                         $('.modal-title').html(titulo);
                                                         $('.modal-body').html(html_body);
                                                         $('.modal-footer').html(html_footer + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>');
