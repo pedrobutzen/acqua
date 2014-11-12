@@ -4,7 +4,7 @@ locale = locale.split("/");
 var pagina_url = locale[4];
 var action_id_local = "";
 var tr_clicada = "";
-switch (locale[4]) {
+switch (pagina_url) {
     case 'peca':
         listar('peca', 1, 10);
         carregar_select('peca');
@@ -22,7 +22,7 @@ switch (locale[4]) {
                 }
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_cadastrar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "peca",
@@ -65,7 +65,7 @@ switch (locale[4]) {
                 }
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_editar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "peca",
@@ -110,7 +110,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_cadastrar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "tipoocorrencia",
@@ -141,7 +141,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_editar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "tipoocorrencia",
@@ -200,7 +200,7 @@ switch (locale[4]) {
                 alert_close("all");
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_cadastrar.php',
                     dataType: 'json', data: {
                         action_pagina: "lancamento",
                         action: "cadastrar",
@@ -281,7 +281,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_cadastrar.php',
                     dataType: 'json', data: {
                         action_pagina: "usuario-funcionario",
                         action: "cadastrar",
@@ -302,7 +302,7 @@ switch (locale[4]) {
                             alert_open("danger", retorno.msg_erro);
                         }
                     },
-                    error: function (retorno) {
+                    error: function () {
                         alert_open("danger", "Erro inesperando, tente novamente mais tarde.");
                     }
                 });
@@ -321,7 +321,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_editar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "usuario-funcionario",
@@ -359,7 +359,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_cadastrar.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "numero",
@@ -405,7 +405,7 @@ switch (locale[4]) {
             } else {
                 $.ajax({
                     type: 'GET',
-                    url: 'action/action.php',
+                    url: 'action/action_outros.php',
                     dataType: 'json',
                     data: {
                         action_pagina: "numero",
@@ -471,7 +471,7 @@ function logar() {
     } else {
         $.ajax({
             type: 'GET',
-            url: 'action/action.php',
+            url: 'action/action_outros.php',
             dataType: 'json',
             data: {
                 action_pagina: 'usuario',
@@ -495,11 +495,12 @@ function logar() {
 function deslogar() {
     $.ajax({
         type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_outros.php',
         dataType: 'json',
         data: {
             action_pagina: 'usuario',
-            action: 'deslogar'}, success: function (retorno) {
+            action: 'deslogar'
+        }, success: function (retorno) {
             if (retorno.erro === false) {
                 location.href = caminho + "login";
             } else {
@@ -515,7 +516,7 @@ function deslogar() {
 function carregar_select(action_pagina) {
     $.ajax({
         type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_listar.php',
         dataType: 'json',
         data: {
             action_pagina: action_pagina,
@@ -548,7 +549,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
     limpar_form_cadastro();
     $.ajax({
         type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_listar.php',
         dataType: 'json',
         data: {
             action_pagina: action_pagina,
@@ -616,7 +617,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             $('button.cs-entradapecalancamento').click(function () {
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'action/action.php',
+                                    url: 'action/action_outros.php',
                                     dataType: 'json',
                                     data: {
                                         action_pagina: 'entradapeca',
@@ -650,7 +651,7 @@ function listar(action_pagina, pagina_paginacao, qtd_itens) {
                             $('button.cs-saidapecalancamento').click(function () {
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'action/action.php',
+                                    url: 'action/action_outros.php',
                                     dataType: 'json',
                                     data: {
                                         action_pagina: 'saidapeca',
@@ -848,7 +849,7 @@ function pre_editar(pagina, id) {
     $('div#cs-alert-success').hide();
     $('button.cs-pre-cadastrar').show();
     $.ajax({type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_montar.php',
         dataType: 'json',
         data: {
             action_pagina: pagina,
@@ -902,7 +903,7 @@ function pre_editar(pagina, id) {
 function excluir(pagina, id) {
     $.ajax({
         type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_excluir.php',
         dataType: 'json',
         data: {
             action_pagina: pagina,
@@ -980,7 +981,7 @@ function modal_open(id, pagina, titulo) {
     var titulo_oficial = titulo;
     $.ajax({
         type: 'GET',
-        url: 'action/action.php',
+        url: 'action/action_montar.php',
         dataType: 'json',
         data: {
             action_pagina: pagina,
@@ -1264,7 +1265,7 @@ function modal_open(id, pagina, titulo) {
                     $('button.cs-finalizar-ocorrencia').click(function () {
                         $.ajax({
                             type: 'GET',
-                            url: 'action/action.php',
+                            url: 'action/action_outros.php',
                             dataType: 'json',
                             data: {
                                 action_pagina: 'gerenciarocorrencia',
@@ -1305,7 +1306,7 @@ function modal_open(id, pagina, titulo) {
                         } else {
                             $.ajax({
                                 type: 'GET',
-                                url: 'action/action.php',
+                                url: 'action/action_cadastrar.php',
                                 dataType: 'json',
                                 data: {
                                     action_pagina: "ocorrencia",
@@ -1337,7 +1338,7 @@ function modal_open(id, pagina, titulo) {
                     $('button.cs-editar-lancamento').click(function () {
                         $.ajax({
                             type: 'GET',
-                            url: 'action/action.php',
+                            url: 'action/action_outros.php',
                             dataType: 'json',
                             data: {
                                 action_pagina: 'entradapeca',
@@ -1373,7 +1374,7 @@ function modal_open(id, pagina, titulo) {
                                             }
                                             $.ajax({
                                                 type: 'GET',
-                                                url: 'action/action.php',
+                                                url: 'action/action_editar.php',
                                                 dataType: 'json',
                                                 data: {
                                                     action_pagina: "peca",
@@ -1411,7 +1412,7 @@ function modal_open(id, pagina, titulo) {
                                         } else {
                                             $.ajax({
                                                 type: 'GET',
-                                                url: 'action/action.php',
+                                                url: 'action/action_outros.php',
                                                 dataType: 'json',
                                                 data: {
                                                     action_pagina: 'entradapeca',
@@ -1442,7 +1443,7 @@ function modal_open(id, pagina, titulo) {
                                                                 }
                                                                 $.ajax({
                                                                     type: 'GET',
-                                                                    url: 'action/action.php',
+                                                                    url: 'action/action_editar.php',
                                                                     dataType: 'json',
                                                                     data: {
                                                                         action_pagina: "peca",
@@ -1515,7 +1516,7 @@ function modal_open(id, pagina, titulo) {
                 $('#cs-modal .cs-bloquear').click(function () {
                     $.ajax({
                         type: 'GET',
-                        url: 'action/action.php',
+                        url: 'action/action_outros.php',
                         dataType: 'json',
                         data: {
                             action_pagina: 'usuario-aluno',
@@ -1540,7 +1541,7 @@ function modal_open(id, pagina, titulo) {
                 $('#cs-modal .cs-desbloquear').click(function () {
                     $.ajax({
                         type: 'GET',
-                        url: 'action/action.php',
+                        url: 'action/action_outros.php',
                         dataType: 'json',
                         data: {
                             action_pagina: 'usuario-aluno',
@@ -1575,7 +1576,7 @@ function modal_open(id, pagina, titulo) {
                         case "entradapeca":
                             $.ajax({
                                 type: 'GET',
-                                url: 'action/action.php',
+                                url: 'action/action_outros.php',
                                 dataType: 'json',
                                 data: {
                                     action_pagina: 'entradapeca',
@@ -1586,7 +1587,6 @@ function modal_open(id, pagina, titulo) {
                                         if (retorno.status === 0) {
                                             titulo = "Digite a senha para autorização - Aluno";
                                             html_body = '<form class="form-horizontal" role="form"><div class="form-group"><label class="col-sm-2 control-label">RA</label><div class="col-sm-10"><p class="form-control-static">' + retorno.usuario + '</p></div></div><div class="form-group"><label for="inputPassword" class="col-sm-2 control-label">Senha</label><div class="col-sm-10"><input type="password" name="senha" class="form-control" id="inputPassword" placeholder="Senha"></div></div></form>';
-                                            //html_body = '<strong>Usuário: </strong>' + retorno.usuario + '<br><input type="password" name="senha" class="form-control" placeholder="Senha">';
                                             html_footer = '<button type="button" class="btn btn-primary cs-autorizar">Autorizar</button>';
                                         } else {
                                             titulo = "Deseja realmente remover  do lançamento a peça selecionada?";
@@ -1609,7 +1609,7 @@ function modal_open(id, pagina, titulo) {
                                             } else {
                                                 $.ajax({
                                                     type: 'GET',
-                                                    url: 'action/action.php',
+                                                    url: 'action/action_outros.php',
                                                     dataType: 'json',
                                                     data: {
                                                         action_pagina: 'entradapeca',
@@ -1679,7 +1679,7 @@ function modal_open(id, pagina, titulo) {
                 $('#cs-modal .cs-conf-alterar-num').click(function () {
                     $.ajax({
                         type: 'GET',
-                        url: 'action/action.php',
+                        url: 'action/action_listar.php',
                         dataType: 'json',
                         data: {
                             action_pagina: 'numero',
@@ -1716,7 +1716,7 @@ function modal_open(id, pagina, titulo) {
                                     var novo_numero = $('select[name=novo_numero]').val();
                                     $.ajax({
                                         type: 'GET',
-                                        url: 'action/action.php',
+                                        url: 'action/action_editar.php',
                                         dataType: 'json',
                                         data: {
                                             action_pagina: 'numero',
@@ -1749,6 +1749,8 @@ function modal_open(id, pagina, titulo) {
     });
 }
 $(document).ready(function () {
+    $('div#cs-alert-success').hide();
+    $('div#cs-alert-danger').hide();
     $('button.cs-btn-pesquisar-usuario').click(function () {
         if ($('.cs-li-aluno').hasClass('active')) {
             action_id_local = $('input[name=pesquisa]').val();
@@ -1877,7 +1879,7 @@ $(document).ready(function () {
         } else {
             $.ajax({
                 type: 'GET',
-                url: 'action/action.php',
+                url: 'action/action_outros.php',
                 dataType: 'json',
                 data: {
                     action_pagina: 'usuario',

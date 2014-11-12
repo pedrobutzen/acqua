@@ -11,23 +11,20 @@ include_once 'conexao/conexao.php';
             <?php echo $pageTitulo ?>
         </title>
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <link href="<?php echo $caminho ?>view/img/falvicon/icone.ico" rel="shortcut icon"/>
-        <!-- jQuery JavaScript Library v1.10.2 -->
-        <script src="<?php echo $caminho ?>view/js/jquery/jquery-latest.js"></script>
-        <!-- Bootstrap v3.1.1 -->        
-        <link href="<?php echo $caminho ?>view/css/bootstrap/bootstrap.css" rel="stylesheet" type="text/css">
-        <link href="<?php echo $caminho ?>view/css/bootstrap/bootstrap-theme.css" rel="stylesheet" type="text/css">
-        <script src="<?php echo $caminho ?>view/js/bootstrap/bootstrap.js" type="text/javascript"></script>
-        <!-- Modernizr 2.8.1 (Custom Build)-->
-        <script src="<?php echo $caminho ?>view/js/modernizr/modernizr.custom.05848.js" type="text/javascript"></script>
+        <link href="<?php echo $caminho ?>view/img/falvicon/falvicon.ico" rel="shortcut icon"/>
+        <!-- jQuery JavaScript Library v1.11.1 -->
+        <script src="<?php echo $caminho ?>view/js/jquery/jquery-1.11.1.min.js"></script>
+        <!-- Bootstrap v3.1.1 -->
+        <link href="<?php echo $caminho ?>view/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="<?php echo $caminho ?>view/css/bootstrap/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+        <script src="<?php echo $caminho ?>view/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
         <!-- JQuery multi-melect -->
-        <script src="<?php echo $caminho ?>view/js/jquery/jquery.multi-select.js" type="text/javascript"></script>
+        <script src="<?php echo $caminho ?>view/js/jquery/jquery.multi-select.min.js" type="text/javascript"></script>
         <link href="<?php echo $caminho ?>view/css/multi-select.css" rel="stylesheet" type="text/css">
         <!-- Ionicons, v1.4.1 -->
         <link href="<?php echo $caminho ?>view/css/ion-icon/ionicons.min.css" rel="stylesheet" type="text/css">
         <!-- Docs -->
-        <script src="<?php echo $caminho ?>view/js/action.js" type="text/javascript"></script>
-        <script src="<?php echo $caminho ?>view/js/script.js" type="text/javascript"></script>
+        <script src="<?php echo $caminho ?>view/js/action.min.js" type="text/javascript"></script>
         <link href="<?php echo $caminho ?>view/css/style.css" rel="stylesheet" type="text/css">
     </head>
     <body>

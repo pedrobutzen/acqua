@@ -3,19 +3,22 @@
         <meta charset="UTF-8">
         <title>Login | Acqua - Lavanderia UNASP-EC</title>
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <link href="view/img/falvicon/icone.ico" rel="shortcut icon"/>
-        <!-- Jquery -->
-        <script src="view/js/jquery/jquery-latest.js"></script>
+        <link href="view/img/falvicon/falvicon.ico" rel="shortcut icon"/>
+        <!-- jQuery JavaScript Library v1.11.1 -->
+        <script src="view/js/jquery/jquery-1.11.1.min.js"></script>
         <!-- Bootstrap v3.1.1 -->        
         <link href="view/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="view/css/bootstrap/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
         <script src="view/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
-        <!-- Modernizr 2.8.1 (Custom Build)-->
-        <script src="view/js/modernizr/modernizr.custom.05848.js" type="text/javascript"></script>
+        <!-- JQuery multi-melect -->
+        <script src="view/js/jquery/jquery.multi-select.min.js" type="text/javascript"></script>
+        <link href="view/css/multi-select.css" rel="stylesheet" type="text/css">
+        <!-- Ionicons, v1.4.1 -->
+        <link href="view/css/ion-icon/ionicons.min.css" rel="stylesheet" type="text/css">
         <!-- Docs -->
+        <script src="view/js/action.min.js" type="text/javascript"></script>
         <link href="view/css/login_style.css" rel="stylesheet" type="text/css">
-        <script src="view/js/script.js" type="text/javascript"></script>
-        <script src="view/js/action.js" type="text/javascript"></script>
+        <script src="view/js/action.min.js" type="text/javascript"></script>
     </head>
     <body class="bg-blue"> 
         <div class="text-center"><img src="view/img/unasp-top.png" /></div> 
